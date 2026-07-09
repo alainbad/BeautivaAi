@@ -1,10 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Send, Sparkles } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, MessageCircleHeart } from "lucide-react";
 import { chatSuggestions, mockChat } from "@/lib/mock-data";
+import { EmptyState } from "@/components/ui-primitives";
 
 export const Route = createFileRoute("/chat")({
   component: ChatPage,
+  head: () => ({
+    meta: [
+      { title: "AI Beauty Chat — BeautyAI" },
+      { name: "description", content: "Ask BeautyAI anything about skincare — routines, ingredients, and personalized guidance in seconds." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 type Msg = { role: "assistant" | "user"; text: string };
