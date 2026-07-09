@@ -30,6 +30,7 @@ export type Profile = {
   allergies: string[];
   preferred_budget: string | null;
   country: string | null;
+  date_of_birth: string | null;
   is_admin: boolean;
   created_at: string;
   updated_at: string;
