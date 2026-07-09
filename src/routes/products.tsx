@@ -7,6 +7,16 @@ import { Bookmark, Star, SlidersHorizontal, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/products")({
   component: ProductsPage,
+  head: () => ({
+    meta: [
+      { title: "Recommended Products — BeautyAI" },
+      { name: "description", content: "Real luxury and dermatologist-favorite skincare curated for your skin type and concerns." },
+      { property: "og:title", content: "Recommended Products — BeautyAI" },
+      { property: "og:description", content: "Real luxury and dermatologist-favorite skincare curated for your skin type and concerns." },
+      { property: "og:url", content: "/products" },
+    ],
+    links: [{ rel: "canonical", href: "/products" }],
+  }),
 });
 
 const categories = ["All", "Cleanser", "Toner", "Serum", "Moisturizer", "Sunscreen", "Treatment"];

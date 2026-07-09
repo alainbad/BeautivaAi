@@ -4,6 +4,15 @@ import { GlassCard } from "@/components/ui-primitives";
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
+  head: () => ({
+    meta: [
+      { title: "Admin — BeautyAI" },
+      { name: "description", content: "Admin dashboard for BeautyAI operators." },
+      { property: "og:title", content: "Admin — BeautyAI" },
+      { property: "og:description", content: "Admin dashboard for BeautyAI operators." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 const stats = [

@@ -3,6 +3,15 @@ import { ArrowLeft, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: Login,
+  head: () => ({
+    meta: [
+      { title: "Log in — BeautyAI" },
+      { name: "description", content: "Sign in to your BeautyAI account to continue your skincare journey." },
+      { property: "og:title", content: "Log in — BeautyAI" },
+      { property: "og:description", content: "Sign in to your BeautyAI account to continue your skincare journey." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 function Login() {

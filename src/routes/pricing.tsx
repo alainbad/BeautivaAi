@@ -4,6 +4,16 @@ import { ArrowLeft, Check } from "lucide-react";
 
 export const Route = createFileRoute("/pricing")({
   component: Pricing,
+  head: () => ({
+    meta: [
+      { title: "Pricing — BeautyAI" },
+      { name: "description", content: "Start free or unlock Premium: unlimited analyses, AI Beauty Chat, and progress tracking." },
+      { property: "og:title", content: "Pricing — BeautyAI" },
+      { property: "og:description", content: "Start free or unlock Premium: unlimited analyses, AI Beauty Chat, and progress tracking." },
+      { property: "og:url", content: "/pricing" },
+    ],
+    links: [{ rel: "canonical", href: "/pricing" }],
+  }),
 });
 
 const perks = {

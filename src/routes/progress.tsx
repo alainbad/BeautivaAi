@@ -6,6 +6,15 @@ import { progressTimeline } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/progress")({
   component: ProgressPage,
+  head: () => ({
+    meta: [
+      { title: "Progress — BeautyAI" },
+      { name: "description", content: "Track your skin's transformation over time with weekly photos and scores." },
+      { property: "og:title", content: "Progress — BeautyAI" },
+      { property: "og:description", content: "Track your skin's transformation over time with weekly photos and scores." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 function ProgressPage() {

@@ -4,6 +4,15 @@ import { GlassCard } from "@/components/ui-primitives";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
+  head: () => ({
+    meta: [
+      { title: "Settings — BeautyAI" },
+      { name: "description", content: "Manage notifications, appearance, and account preferences." },
+      { property: "og:title", content: "Settings — BeautyAI" },
+      { property: "og:description", content: "Manage notifications, appearance, and account preferences." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 function Settings() {

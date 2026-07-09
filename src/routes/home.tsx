@@ -6,6 +6,15 @@ import { Bell, ChevronRight, Sparkles, Sun, Moon, TrendingUp } from "lucide-reac
 
 export const Route = createFileRoute("/home")({
   component: Home,
+  head: () => ({
+    meta: [
+      { title: "Home — BeautyAI" },
+      { name: "description", content: "Your personalized BeautyAI dashboard: skin score, routine, and daily glow." },
+      { property: "og:title", content: "Home — BeautyAI" },
+      { property: "og:description", content: "Your personalized BeautyAI dashboard: skin score, routine, and daily glow." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 function Home() {

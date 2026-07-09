@@ -7,6 +7,15 @@ import { Sun, Moon, Check } from "lucide-react";
 
 export const Route = createFileRoute("/routine")({
   component: RoutinePage,
+  head: () => ({
+    meta: [
+      { title: "Your Routine — BeautyAI" },
+      { name: "description", content: "Personalized morning and evening skincare routine built by BeautyAI." },
+      { property: "og:title", content: "Your Routine — BeautyAI" },
+      { property: "og:description", content: "Personalized morning and evening skincare routine built by BeautyAI." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 type Tab = "am" | "pm";
