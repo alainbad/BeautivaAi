@@ -1,8 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { MobileShell, ScreenHeader } from "@/components/mobile-shell";
 import { GlassCard, DisclaimerBox, Pill, ScoreRing } from "@/components/ui-primitives";
-import { skinMetrics, aiSummary } from "@/lib/mock-data";
+import { captureImageDataUrl } from "@/lib/capacitor/camera";
+import { buildSkinMetrics, scoreLabel } from "@/lib/skin-analysis-display";
+import { analyzeSkinPhoto } from "@/functions/skin-analysis";
+import type { SkinAnalysis } from "@/lib/supabase/types";
 import { Camera, Image as ImageIcon, Sparkles, RefreshCw, Check } from "lucide-react";
 
 export const Route = createFileRoute("/analyze")({
@@ -10,9 +13,15 @@ export const Route = createFileRoute("/analyze")({
   head: () => ({
     meta: [
       { title: "Skin Analysis — BeautyAI" },
-      { name: "description", content: "Upload a selfie to get your AI-powered skin score and cosmetic breakdown." },
+      {
+        name: "description",
+        content: "Upload a selfie to get your AI-powered skin score and cosmetic breakdown.",
+      },
       { property: "og:title", content: "Skin Analysis — BeautyAI" },
-      { property: "og:description", content: "Upload a selfie to get your AI-powered skin score and cosmetic breakdown." },
+      {
+        property: "og:description",
+        content: "Upload a selfie to get your AI-powered skin score and cosmetic breakdown.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -22,12 +31,49 @@ type Phase = "intro" | "preview" | "loading" | "result";
 
 function Analyze() {
   const [phase, setPhase] = useState<Phase>("intro");
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<SkinAnalysis | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const capture = async (source: "camera" | "library") => {
+    setError(null);
+    try {
+      const dataUrl = await captureImageDataUrl(source);
+      setPhoto(dataUrl);
+      setPhase("preview");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't access the camera.");
+    }
+  };
+
+  const runAnalysis = async () => {
+    if (!photo) return;
+    setPhase("loading");
+    setError(null);
+    try {
+      const res = await analyzeSkinPhoto({ data: { dataUrl: photo } });
+      if (!res.success) throw new Error(res.error);
+      setAnalysis(res.data.analysis);
+      setPhase("result");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Analysis failed. Please try again.");
+      setPhase("preview");
+    }
+  };
+
+  const metrics = analysis ? buildSkinMetrics(analysis) : [];
 
   return (
     <MobileShell>
       <ScreenHeader title="Skin analysis" subtitle="Cosmetic guidance, powered by AI vision." />
 
       <section className="px-6 space-y-4">
+        {error && (
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs text-destructive">
+            {error}
+          </div>
+        )}
+
         {phase === "intro" && (
           <>
             <GlassCard>
@@ -38,13 +84,13 @@ function Analyze() {
               </div>
               <div className="mt-4 grid grid-cols-2 gap-2.5">
                 <button
-                  onClick={() => setPhase("preview")}
+                  onClick={() => capture("camera")}
                   className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-rose text-primary-foreground text-[15px] font-medium"
                 >
                   <Camera className="h-4 w-4" /> Take photo
                 </button>
                 <button
-                  onClick={() => setPhase("preview")}
+                  onClick={() => capture("library")}
                   className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-card text-[15px] font-medium"
                 >
                   <ImageIcon className="h-4 w-4" /> Upload
@@ -73,8 +119,8 @@ function Analyze() {
             </GlassCard>
 
             <DisclaimerBox>
-              This analysis is for cosmetic guidance only and is not a medical diagnosis.
-              For serious skin concerns, consult a dermatologist.
+              This analysis is for cosmetic guidance only and is not a medical diagnosis. For
+              serious skin concerns, consult a dermatologist.
             </DisclaimerBox>
           </>
         )}
@@ -82,8 +128,18 @@ function Analyze() {
         {phase === "preview" && (
           <>
             <GlassCard>
-              <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gradient-blush" />
-              <p className="mt-3 text-center text-xs text-muted-foreground">Photo looks great — ready to analyze.</p>
+              <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gradient-blush">
+                {photo && (
+                  <img
+                    src={photo}
+                    alt="Your selfie preview"
+                    className="h-full w-full object-cover"
+                  />
+                )}
+              </div>
+              <p className="mt-3 text-center text-xs text-muted-foreground">
+                Photo looks great — ready to analyze.
+              </p>
             </GlassCard>
             <div className="grid grid-cols-2 gap-2.5">
               <button
@@ -93,10 +149,7 @@ function Analyze() {
                 <RefreshCw className="h-4 w-4" /> Retake
               </button>
               <button
-                onClick={() => {
-                  setPhase("loading");
-                  setTimeout(() => setPhase("result"), 1800);
-                }}
+                onClick={runAnalysis}
                 className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-rose text-primary-foreground font-medium"
               >
                 <Sparkles className="h-4 w-4" /> Analyze
@@ -120,13 +173,17 @@ function Analyze() {
           </GlassCard>
         )}
 
-        {phase === "result" && (
+        {phase === "result" && analysis && (
           <>
             <GlassCard className="flex items-center gap-5">
-              <ScoreRing score={82} />
+              <ScoreRing score={analysis.skin_score ?? 0} />
               <div className="flex-1">
-                <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Overall</p>
-                <p className="font-display text-2xl font-semibold">Radiant</p>
+                <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                  Overall
+                </p>
+                <p className="font-display text-2xl font-semibold">
+                  {scoreLabel(analysis.skin_score ?? 0)}
+                </p>
                 <p className="mt-1 text-xs text-muted-foreground">You're glowing today ✨</p>
               </div>
             </GlassCard>
@@ -134,7 +191,7 @@ function Analyze() {
             <GlassCard>
               <h3 className="font-display text-[15px] font-semibold">Breakdown</h3>
               <ul className="mt-3 space-y-3">
-                {skinMetrics.map((m) => (
+                {metrics.map((m) => (
                   <li key={m.label}>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-foreground/85">{m.label}</span>
@@ -150,19 +207,28 @@ function Analyze() {
 
             <GlassCard>
               <h3 className="font-display text-[15px] font-semibold">AI summary</h3>
-              <p className="mt-2 text-sm leading-relaxed text-foreground/85">{aiSummary}</p>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/85">
+                {analysis.ai_summary}
+              </p>
               <div className="mt-4 grid grid-cols-2 gap-2.5">
-                <button className="h-11 rounded-2xl border border-border bg-card text-sm font-medium">
+                <Link
+                  to="/routine"
+                  className="flex h-11 items-center justify-center rounded-2xl border border-border bg-card text-sm font-medium"
+                >
                   View routine
-                </button>
-                <button className="h-11 rounded-2xl bg-gradient-rose text-primary-foreground text-sm font-medium">
+                </Link>
+                <Link
+                  to="/products"
+                  className="flex h-11 items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground text-sm font-medium"
+                >
                   See products
-                </button>
+                </Link>
               </div>
             </GlassCard>
 
             <DisclaimerBox>
-              Cosmetic guidance only. Not a medical diagnosis. Consult a dermatologist for medical concerns.
+              {analysis.disclaimer ??
+                "Cosmetic guidance only. Not a medical diagnosis. Consult a dermatologist for medical concerns."}
             </DisclaimerBox>
           </>
         )}

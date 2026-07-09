@@ -3,13 +3,18 @@ import { useState } from "react";
 import { ArrowLeft, Send, Sparkles, MessageCircleHeart } from "lucide-react";
 import { chatSuggestions, mockChat } from "@/lib/mock-data";
 import { EmptyState } from "@/components/ui-primitives";
+import { sendChatMessage } from "@/functions/chat";
 
 export const Route = createFileRoute("/chat")({
   component: ChatPage,
   head: () => ({
     meta: [
       { title: "AI Beauty Chat — BeautyAI" },
-      { name: "description", content: "Ask BeautyAI anything about skincare — routines, ingredients, and personalized guidance in seconds." },
+      {
+        name: "description",
+        content:
+          "Ask BeautyAI anything about skincare — routines, ingredients, and personalized guidance in seconds.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -21,22 +26,24 @@ function ChatPage() {
   const [messages, setMessages] = useState<Msg[]>(mockChat);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const send = (text: string) => {
+  const send = async (text: string) => {
     if (!text.trim()) return;
+    const history = messages.slice(-10);
     setMessages((m) => [...m, { role: "user", text }]);
     setInput("");
     setTyping(true);
-    setTimeout(() => {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          text: "Great question! For balanced results, layer Vitamin C in the morning and retinol at night — never at the same time. Always follow with SPF during the day.",
-        },
-      ]);
+    setError(null);
+    try {
+      const res = await sendChatMessage({ data: { message: text, history } });
+      if (!res.success) throw new Error(res.error);
+      setMessages((m) => [...m, { role: "assistant", text: res.data.reply }]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't reach BeautyAI. Please try again.");
+    } finally {
       setTyping(false);
-    }, 1200);
+    }
   };
 
   const isEmpty = messages.length <= 1;
@@ -52,7 +59,10 @@ function ChatPage() {
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </Link>
         <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground" aria-hidden="true">
+          <span
+            className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground"
+            aria-hidden="true"
+          >
             <Sparkles className="h-4 w-4" />
           </span>
           <div>
@@ -62,8 +72,11 @@ function ChatPage() {
         </div>
       </header>
 
-
-      <main className="flex-1 overflow-y-auto px-4 py-4 space-y-3" aria-live="polite" aria-atomic="false">
+      <main
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
+        aria-live="polite"
+        aria-atomic="false"
+      >
         {isEmpty ? (
           <EmptyState
             icon={<MessageCircleHeart className="h-6 w-6" aria-hidden="true" />}
@@ -95,11 +108,20 @@ function ChatPage() {
             </div>
           </div>
         )}
+        {error && (
+          <div className="flex justify-start">
+            <div className="max-w-[85%] rounded-3xl rounded-bl-md border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-xs text-destructive">
+              {error}
+            </div>
+          </div>
+        )}
       </main>
 
       {isEmpty && (
         <div className="px-4 pb-2">
-          <p className="mb-2 px-1 text-[11px] uppercase tracking-widest text-muted-foreground">Try asking</p>
+          <p className="mb-2 px-1 text-[11px] uppercase tracking-widest text-muted-foreground">
+            Try asking
+          </p>
           <div className="flex flex-wrap gap-2">
             {chatSuggestions.map((s) => (
               <button
@@ -121,7 +143,9 @@ function ChatPage() {
         }}
         className="safe-bottom sticky bottom-0 flex items-center gap-2 border-t border-border/60 bg-background/95 px-4 py-3 backdrop-blur"
       >
-        <label htmlFor="chat-input" className="sr-only">Message Beauty AI</label>
+        <label htmlFor="chat-input" className="sr-only">
+          Message Beauty AI
+        </label>
         <input
           id="chat-input"
           value={input}

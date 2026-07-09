@@ -1,15 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 import { ArrowLeft, Check } from "lucide-react";
+import { unwrap } from "@/lib/query-helpers";
+import { getSubscription, createCheckoutSession } from "@/functions/subscriptions";
 
 export const Route = createFileRoute("/pricing")({
   component: Pricing,
   head: () => ({
     meta: [
       { title: "Pricing — BeautyAI" },
-      { name: "description", content: "Start free or unlock Premium: unlimited analyses, AI Beauty Chat, and progress tracking." },
+      {
+        name: "description",
+        content:
+          "Start free or unlock Premium: unlimited analyses, AI Beauty Chat, and progress tracking.",
+      },
       { property: "og:title", content: "Pricing — BeautyAI" },
-      { property: "og:description", content: "Start free or unlock Premium: unlimited analyses, AI Beauty Chat, and progress tracking." },
+      {
+        property: "og:description",
+        content:
+          "Start free or unlock Premium: unlimited analyses, AI Beauty Chat, and progress tracking.",
+      },
       { property: "og:url", content: "/pricing" },
     ],
     links: [{ rel: "canonical", href: "/pricing" }],
@@ -17,7 +30,12 @@ export const Route = createFileRoute("/pricing")({
 });
 
 const perks = {
-  free: ["Basic profile & onboarding", "1 skin analysis / month", "Basic routine", "Product recommendations"],
+  free: [
+    "Basic profile & onboarding",
+    "1 skin analysis / month",
+    "Basic routine",
+    "Product recommendations",
+  ],
   premium: [
     "Unlimited skin analyses",
     "Progress tracking with photos",
@@ -30,10 +48,36 @@ const perks = {
 
 function Pricing() {
   const [billing, setBilling] = useState<"monthly" | "yearly">("yearly");
+  const subscriptionQuery = useQuery({
+    queryKey: ["subscription"],
+    queryFn: () => unwrap(getSubscription()),
+  });
+  const isPremium = subscriptionQuery.data?.plan === "premium";
+
+  const checkoutMutation = useMutation({
+    mutationFn: () =>
+      unwrap(
+        createCheckoutSession({
+          data: { billing, platform: Capacitor.isNativePlatform() ? "ios" : "web" },
+        }),
+      ),
+    onSuccess: async (res) => {
+      if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url: res.checkoutUrl });
+      } else {
+        window.location.assign(res.checkoutUrl);
+      }
+    },
+  });
+
   return (
     <div className="mx-auto min-h-dvh w-full max-w-[430px] bg-background safe-x">
       <header className="safe-top flex items-center gap-3 px-6 pt-4 pb-3">
-        <Link to="/home" aria-label="Go back" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
+        <Link
+          to="/home"
+          aria-label="Go back"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card"
+        >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </Link>
         <h1 className="font-display text-2xl font-semibold">Pricing</h1>
@@ -50,7 +94,9 @@ function Pricing() {
               key={b}
               onClick={() => setBilling(b)}
               className={`flex-1 rounded-xl py-2 font-medium transition ${
-                billing === b ? "bg-gradient-rose text-primary-foreground shadow" : "text-foreground/70"
+                billing === b
+                  ? "bg-gradient-rose text-primary-foreground shadow"
+                  : "text-foreground/70"
               }`}
             >
               {b === "monthly" ? "Monthly" : "Yearly · save 33%"}
@@ -86,7 +132,9 @@ function Pricing() {
               <span className="font-display text-3xl font-semibold">
                 {billing === "monthly" ? "$4.99" : "$39.99"}
               </span>
-              <span className="text-sm text-foreground/70">/{billing === "monthly" ? "month" : "year"}</span>
+              <span className="text-sm text-foreground/70">
+                /{billing === "monthly" ? "month" : "year"}
+              </span>
             </div>
             <p className="mt-1 text-xs text-foreground/70">
               {billing === "yearly" ? "That's just $3.33/month, billed yearly." : "Cancel anytime."}
@@ -101,8 +149,21 @@ function Pricing() {
                 </li>
               ))}
             </ul>
-            <button className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-foreground text-background text-sm font-semibold">
-              Upgrade to Premium
+            {checkoutMutation.error && (
+              <p className="mt-3 text-xs font-medium text-destructive">
+                {checkoutMutation.error.message}
+              </p>
+            )}
+            <button
+              onClick={() => checkoutMutation.mutate()}
+              disabled={isPremium || checkoutMutation.isPending}
+              className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-foreground text-background text-sm font-semibold disabled:opacity-60"
+            >
+              {isPremium
+                ? "You're on Premium"
+                : checkoutMutation.isPending
+                  ? "Redirecting…"
+                  : "Upgrade to Premium"}
             </button>
           </div>
         </div>

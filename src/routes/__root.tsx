@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { initNativeDeepLinks } from "../lib/capacitor/deep-link";
 
 function NotFoundComponent() {
   return (
@@ -76,15 +77,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
+      },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "theme-color", content: "#fbf6ef" },
       { title: "BeautyAI — Your Personal AI Beauty Assistant" },
-      { name: "description", content: "Analyze your skin, build your routine, track your progress, and discover products made for you." },
+      {
+        name: "description",
+        content:
+          "Analyze your skin, build your routine, track your progress, and discover products made for you.",
+      },
       { name: "author", content: "BeautyAI" },
       { property: "og:title", content: "BeautyAI — Your Personal AI Beauty Assistant" },
-      { property: "og:description", content: "AI skin analysis, personalized skincare routines, and product recommendations — all in one iOS app." },
+      {
+        property: "og:description",
+        content:
+          "AI skin analysis, personalized skincare routines, and product recommendations — all in one iOS app.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -94,7 +106,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/app-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -119,6 +134,14 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    initNativeDeepLinks((status) => {
+      window.location.assign(
+        status === "success" ? "/pricing?checkout=success" : "/pricing?checkout=cancel",
+      );
+    });
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

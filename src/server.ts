@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { handleStripeWebhook } from "./server/http/stripe-webhook";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -46,6 +47,14 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    // Raw HTTP route for the Stripe webhook — bypasses the TanStack Start RPC
+    // layer because Stripe needs a stable public URL and the exact raw body
+    // for signature verification. Configure this path in the Stripe dashboard.
+    const url = new URL(request.url);
+    if (url.pathname === "/api/stripe/webhook" && request.method === "POST") {
+      return handleStripeWebhook(request);
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
