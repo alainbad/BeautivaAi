@@ -518,9 +518,7 @@ function AiTool({
     </button>
   );
 }
-    </MobileShell>
-  );
-}
+
 
 function Slider({
   label,
