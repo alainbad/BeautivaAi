@@ -1,11 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MobileShell, ScreenHeader } from "@/components/mobile-shell";
 import { GlassCard } from "@/components/ui-primitives";
+import { useAuth, useSubscription, isPro } from "@/hooks/use-auth";
 import {
   Camera,
   Download,
   ImagePlus,
+  Lock,
   RotateCcw,
   Sparkles,
   Trash2,
