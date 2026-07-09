@@ -51,7 +51,7 @@ export const serverEnv = {
     return required("APPLE_IAP_PRIVATE_KEY").replace(/\\n/g, "\n");
   },
   get appleIapBundleId() {
-    return process.env.APPLE_IAP_BUNDLE_ID ?? "com.beautyai.app";
+    return process.env.APPLE_IAP_BUNDLE_ID ?? "com.beautivaai.app";
   },
   get appleIapAppAppleId() {
     const value = process.env.APPLE_IAP_APP_APPLE_ID;

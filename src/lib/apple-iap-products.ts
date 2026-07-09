@@ -3,10 +3,10 @@
 // "BeautyAI Premium"). Shared between client (registering/ordering products)
 // and server (mapping a verified productId back to a billing plan).
 
-export const APPLE_IAP_BUNDLE_ID = "com.beautyai.app";
+export const APPLE_IAP_BUNDLE_ID = "com.beautivaai.app";
 
-export const APPLE_PRODUCT_ID_PREMIUM_MONTHLY = "com.beautyai.app.premium.monthly";
-export const APPLE_PRODUCT_ID_PREMIUM_YEARLY = "com.beautyai.app.premium.yearly";
+export const APPLE_PRODUCT_ID_PREMIUM_MONTHLY = "com.beautivaai.app.premium.monthly";
+export const APPLE_PRODUCT_ID_PREMIUM_YEARLY = "com.beautivaai.app.premium.yearly";
 
 export type PremiumBilling = "monthly" | "yearly";
 

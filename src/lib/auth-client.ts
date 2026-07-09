@@ -26,16 +26,16 @@ const SignInWithApple = Capacitor.registerPlugin<{
  * + ios/App/App/Info.plist) so Supabase's OAuth redirect can hand control
  * back to the app instead of leaving the user stranded in the browser.
  */
-export const NATIVE_AUTH_CALLBACK_URL = "com.beautyai.app://auth-callback";
+export const NATIVE_AUTH_CALLBACK_URL = "com.beautivaai.app://auth-callback";
 
 /**
  * Services ID configured in Apple Developer (Certificates, Identifiers &
  * Profiles → Identifiers → Services IDs) — only used for the web OAuth
  * fallback below. The native flow signs in with the app's own bundle ID
- * (com.beautyai.app) via AuthenticationServices and ignores this value; see
+ * (com.beautivaai.app) via AuthenticationServices and ignores this value; see
  * README.md "Sign in with Apple" for setup steps.
  */
-const APPLE_SERVICES_ID = "com.beautyai.app.web";
+const APPLE_SERVICES_ID = "com.beautivaai.app.web";
 
 function webRedirectUrl(path: string) {
   return `${window.location.origin}${path}`;
@@ -88,7 +88,7 @@ export async function signOut() {
  * (Capacitor), Supabase's `signInWithOAuth` can't navigate the WKWebView
  * away from the app, so we open the OAuth URL in the system browser via the
  * Capacitor Browser plugin and let capacitor-deep-link.ts pick up the
- * `com.beautyai.app://auth-callback` redirect to finish the sign-in.
+ * `com.beautivaai.app://auth-callback` redirect to finish the sign-in.
  */
 export async function signInWithGoogle() {
   const supabase = getSupabaseBrowserClient();

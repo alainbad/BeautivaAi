@@ -6,7 +6,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 let initialized = false;
 
 /**
- * Wires up `com.beautyai.app://...` deep links so OAuth (Google sign-in) and
+ * Wires up `com.beautivaai.app://...` deep links so OAuth (Google sign-in) and
  * Stripe Checkout can hand control back to the native app. Call once at app
  * startup (see src/routes/__root.tsx). No-ops on web.
  */
@@ -18,7 +18,7 @@ export function initNativeDeepLinks(
 
   CapacitorApp.addListener("appUrlOpen", async ({ url }) => {
     const parsed = new URL(url);
-    if (parsed.protocol !== "com.beautyai.app:") return;
+    if (parsed.protocol !== "com.beautivaai.app:") return;
 
     await Browser.close().catch(() => {});
 

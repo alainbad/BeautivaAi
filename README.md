@@ -38,7 +38,7 @@ are the only ones bundled into the client; everything else is server-only.
 2. In Supabase → Authentication → Providers → Google, paste the client ID
    and secret and enable the provider.
 3. Under Authentication → URL Configuration, add
-   `com.beautyai.app://auth-callback` to the list of allowed redirect URLs
+   `com.beautivaai.app://auth-callback` to the list of allowed redirect URLs
    (this is what lets the OAuth flow hand control back to the iOS app —
    see `src/lib/capacitor/deep-link.ts`).
 
@@ -51,15 +51,15 @@ falls back to a normal OAuth redirect, same as Google. See
 `src/lib/auth-client.ts`'s `signInWithApple`.
 
 1. **Apple Developer → Certificates, Identifiers & Profiles → Identifiers**:
-   open the `com.beautyai.app` App ID and enable the **Sign In with Apple**
+   open the `com.beautivaai.app` App ID and enable the **Sign In with Apple**
    capability.
 2. **Identifiers → Services IDs**: create a new Services ID (e.g.
-   `com.beautyai.app.web`) for the web OAuth fallback. Configure it with:
-   - Primary App ID: `com.beautyai.app`
+   `com.beautivaai.app.web`) for the web OAuth fallback. Configure it with:
+   - Primary App ID: `com.beautivaai.app`
    - Domain: your deployed app's domain (e.g. `your-app.example.com`)
    - Return URL: `https://YOUR_PROJECT.supabase.co/auth/v1/callback`
 
-   If you use a Services ID other than `com.beautyai.app.web`, update
+   If you use a Services ID other than `com.beautivaai.app.web`, update
    `APPLE_SERVICES_ID` in `src/lib/auth-client.ts`.
 3. **Keys**: create a new key with **Sign In with Apple** enabled, associated
    with the Services ID above. Download the `.p8` file (only downloadable
@@ -67,14 +67,14 @@ falls back to a normal OAuth redirect, same as Google. See
    Apple Developer site).
 4. In **Supabase → Authentication → Providers → Apple**, enable the provider
    and set:
-   - **Client IDs**: `com.beautyai.app,com.beautyai.app.web` (comma-separated
+   - **Client IDs**: `com.beautivaai.app,com.beautivaai.app.web` (comma-separated
      — the bundle ID covers native sign-in, the Services ID covers the web
      OAuth fallback)
    - **Secret Key**: paste your Team ID, Key ID, and the `.p8` private key
      contents where Supabase's UI asks for them (it signs the client secret
      JWT for you).
 5. Under Authentication → URL Configuration, confirm
-   `com.beautyai.app://auth-callback` is in the allowed redirect URLs (it's
+   `com.beautivaai.app://auth-callback` is in the allowed redirect URLs (it's
    already there from the Google setup above — reused for Apple's web
    fallback too).
 6. In Xcode, add the **Sign In with Apple** capability to the App target
@@ -107,8 +107,8 @@ Apple using Apple's own official
 2. Add two auto-renewable subscription products in that group, with product
    IDs matching exactly what's hardcoded in
    `src/lib/apple-iap-products.ts`:
-   - `com.beautyai.app.premium.monthly` — $2.99/month
-   - `com.beautyai.app.premium.yearly` — $29.99/year
+   - `com.beautivaai.app.premium.monthly` — $2.99/month
+   - `com.beautivaai.app.premium.yearly` — $29.99/year
 3. Fill in the required subscription display name, description, and pricing
    for each. Submit them for review along with your first app build (Apple
    reviews IAP products together with the app binary).
@@ -124,7 +124,7 @@ Apple using Apple's own official
    APPLE_IAP_ISSUER_ID=<issuer id>
    APPLE_IAP_KEY_ID=<key id>
    APPLE_IAP_PRIVATE_KEY="$(cat AuthKey_XXXXXXXXXX.p8)"
-   APPLE_IAP_BUNDLE_ID=com.beautyai.app
+   APPLE_IAP_BUNDLE_ID=com.beautivaai.app
    APPLE_IAP_APP_APPLE_ID=<numeric App Store app id, Production only>
    APPLE_IAP_ENVIRONMENT=Sandbox   # switch to Production at launch
    ```
@@ -222,7 +222,7 @@ photo, and routine reminder flows):
 ```
 
 Also register the custom URL scheme (for Google sign-in return) by adding a
-`CFBundleURLTypes` entry for `com.beautyai.app` in Info.plist, or via Xcode's
+`CFBundleURLTypes` entry for `com.beautivaai.app` in Info.plist, or via Xcode's
 target → Info → URL Types. In-app purchases don't need this — StoreKit
 purchase and renewal flows are entirely native, no browser redirect involved.
 

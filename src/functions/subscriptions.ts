@@ -62,8 +62,8 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       const [successUrl, cancelUrl] =
         data.platform === "ios"
           ? [
-              "com.beautyai.app://stripe-checkout?status=success",
-              "com.beautyai.app://stripe-checkout?status=cancel",
+              "com.beautivaai.app://stripe-checkout?status=success",
+              "com.beautivaai.app://stripe-checkout?status=cancel",
             ]
           : [
               `${serverEnv.appUrl}/pricing?checkout=success`,
