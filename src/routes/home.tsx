@@ -50,6 +50,7 @@ function Home() {
   });
 
   const firstName = profileQuery.data?.full_name?.split(" ")[0] ?? "there";
+  const profileInitial = profileQuery.data?.full_name?.trim()?.[0]?.toUpperCase() ?? "?";
   const skinScore = analysisQuery.data?.skin_score ?? 0;
   const lastAnalysisDate = analysisQuery.data
     ? new Date(analysisQuery.data.created_at).toLocaleDateString(undefined, {
@@ -85,10 +86,11 @@ function Home() {
         subtitle="Here's how your skin is doing today."
         right={
           <Link
-            to="/settings"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card"
+            to="/profile"
+            aria-label="Go to your profile"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-blush font-display text-sm font-semibold text-rose-gold"
           >
-            <Bell className="h-4 w-4" />
+            {profileInitial}
           </Link>
         }
       />
