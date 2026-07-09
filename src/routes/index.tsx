@@ -1,8 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Camera, ListChecks, ShoppingBag, LineChart, Bell, MessageCircleHeart, ChevronRight, Star } from "lucide-react";
+import heroImage from "@/assets/hero-beauty.jpg";
 
 export const Route = createFileRoute("/")({
   component: Welcome,
+  head: () => ({
+    meta: [
+      { title: "BeautyAI — AI Skin Analysis & Personalized Skincare Routines" },
+      { name: "description", content: "Get a personalized skincare routine from a single selfie. AI-powered skin analysis, product matches, and progress tracking — built for glow." },
+      { property: "og:title", content: "BeautyAI — AI Skin Analysis & Personalized Skincare" },
+      { property: "og:description", content: "Analyze your skin, build your routine, track your progress, and discover products made for you." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "/" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+  }),
 });
 
 const features = [
