@@ -22,7 +22,14 @@ export async function signUpWithPassword(opts: {
   const { data, error } = await supabase.auth.signUp({
     email: opts.email,
     password: opts.password,
-    options: { data: { full_name: opts.fullName } },
+    options: {
+      data: { full_name: opts.fullName },
+      // Confirmation links always land on the web /verified page (opened in
+      // the system browser even from a native shell) — handling the
+      // signup-confirmation hash tokens via a native deep link is a possible
+      // future enhancement, not implemented yet.
+      emailRedirectTo: webRedirectUrl("/verified"),
+    },
   });
   if (error) throw error;
   return data;

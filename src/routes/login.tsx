@@ -41,6 +41,7 @@ export function AuthShell({ mode }: { mode: "login" | "signup" | "forgot" }) {
   const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  const [awaitingEmailConfirmation, setAwaitingEmailConfirmation] = useState(false);
 
   const title =
     mode === "login"
@@ -79,8 +80,14 @@ export function AuthShell({ mode }: { mode: "login" | "signup" | "forgot" }) {
         await signInWithPassword({ email, password });
         nav({ to: "/home" });
       } else if (mode === "signup") {
-        await signUpWithPassword({ email, password, fullName });
-        nav({ to: "/onboarding" });
+        const result = await signUpWithPassword({ email, password, fullName });
+        if (result.session) {
+          // Email confirmation is disabled for this project — already signed in.
+          nav({ to: "/onboarding" });
+        } else {
+          // Email confirmation required — no session yet.
+          setAwaitingEmailConfirmation(true);
+        }
       } else {
         await requestPasswordReset(email);
         setNotice("Check your email for a reset link.");
@@ -119,106 +126,128 @@ export function AuthShell({ mode }: { mode: "login" | "signup" | "forgot" }) {
       </header>
 
       <div className="flex-1 px-6 pt-8">
-        <h1 className="font-display text-3xl font-semibold">{title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{sub}</p>
-
-        <form className="mt-8 space-y-3" onSubmit={handleSubmit}>
-          {mode === "signup" && (
-            <Field
-              label="Full name"
-              type="text"
-              placeholder="Sofia Laurent"
-              value={fullName}
-              onChange={setFullName}
-              required
-            />
-          )}
-          <Field
-            label="Email"
-            type="email"
-            placeholder="you@beautyai.app"
-            value={email}
-            onChange={setEmail}
-            required
-          />
-          {mode !== "forgot" && (
-            <Field
-              label="Password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={setPassword}
-              required
-              minLength={8}
-            />
-          )}
-          {mode === "signup" && (
-            <Field
-              label="Confirm password"
-              type="password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
-              required
-              minLength={8}
-            />
-          )}
-
-          {error && <p className="text-xs font-medium text-destructive">{error}</p>}
-          {notice && <p className="text-xs font-medium text-rose-gold">{notice}</p>}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-2 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground text-[15px] font-medium shadow-md shadow-rose-gold/30 disabled:opacity-60"
-          >
-            {submitLabel}
-          </button>
-        </form>
-
-        {mode !== "forgot" && (
-          <>
-            <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="h-px flex-1 bg-border" />
-              or
-              <span className="h-px flex-1 bg-border" />
-            </div>
-            <button
-              type="button"
-              onClick={handleGoogle}
-              disabled={googleSubmitting}
-              className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card text-[15px] font-medium disabled:opacity-60"
+        {awaitingEmailConfirmation ? (
+          <div className="flex flex-col items-center pt-10 text-center">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-blush/60 text-rose-gold">
+              <Sparkles className="h-6 w-6" />
+            </span>
+            <h1 className="mt-5 font-display text-2xl font-semibold">Check your email</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We sent a verification link to{" "}
+              <span className="font-medium text-foreground">{email}</span>. Click it to activate
+              your account, then log in below.
+            </p>
+            <Link
+              to="/login"
+              className="mt-8 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground text-[15px] font-medium shadow-md shadow-rose-gold/30"
             >
-              {googleSubmitting ? "Opening Google…" : "Continue with Google"}
-            </button>
-          </>
-        )}
-
-        {mode === "login" && (
-          <div className="mt-4 flex items-center justify-between text-sm">
-            <Link to="/forgot" className="text-muted-foreground">
-              Forgot password?
-            </Link>
-            <Link to="/signup" className="font-medium text-rose-gold">
-              Create account
+              Back to log in
             </Link>
           </div>
-        )}
-        {mode === "signup" && (
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link to="/login" className="font-medium text-rose-gold">
-              Log in
-            </Link>
-          </p>
-        )}
-        {mode === "forgot" && (
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Remembered?{" "}
-            <Link to="/login" className="font-medium text-rose-gold">
-              Back to login
-            </Link>
-          </p>
+        ) : (
+          <>
+            <h1 className="font-display text-3xl font-semibold">{title}</h1>
+            <p className="mt-2 text-sm text-muted-foreground">{sub}</p>
+
+            <form className="mt-8 space-y-3" onSubmit={handleSubmit}>
+              {mode === "signup" && (
+                <Field
+                  label="Full name"
+                  type="text"
+                  placeholder="Sofia Laurent"
+                  value={fullName}
+                  onChange={setFullName}
+                  required
+                />
+              )}
+              <Field
+                label="Email"
+                type="email"
+                placeholder="you@beautyai.app"
+                value={email}
+                onChange={setEmail}
+                required
+              />
+              {mode !== "forgot" && (
+                <Field
+                  label="Password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={setPassword}
+                  required
+                  minLength={8}
+                />
+              )}
+              {mode === "signup" && (
+                <Field
+                  label="Confirm password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={setConfirmPassword}
+                  required
+                  minLength={8}
+                />
+              )}
+
+              {error && <p className="text-xs font-medium text-destructive">{error}</p>}
+              {notice && <p className="text-xs font-medium text-rose-gold">{notice}</p>}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="mt-2 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground text-[15px] font-medium shadow-md shadow-rose-gold/30 disabled:opacity-60"
+              >
+                {submitLabel}
+              </button>
+            </form>
+
+            {mode !== "forgot" && (
+              <>
+                <div className="mt-5 flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="h-px flex-1 bg-border" />
+                  or
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleGoogle}
+                  disabled={googleSubmitting}
+                  className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card text-[15px] font-medium disabled:opacity-60"
+                >
+                  {googleSubmitting ? "Opening Google…" : "Continue with Google"}
+                </button>
+              </>
+            )}
+
+            {mode === "login" && (
+              <div className="mt-4 flex items-center justify-between text-sm">
+                <Link to="/forgot" className="text-muted-foreground">
+                  Forgot password?
+                </Link>
+                <Link to="/signup" className="font-medium text-rose-gold">
+                  Create account
+                </Link>
+              </div>
+            )}
+            {mode === "signup" && (
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link to="/login" className="font-medium text-rose-gold">
+                  Log in
+                </Link>
+              </p>
+            )}
+            {mode === "forgot" && (
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                Remembered?{" "}
+                <Link to="/login" className="font-medium text-rose-gold">
+                  Back to login
+                </Link>
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>

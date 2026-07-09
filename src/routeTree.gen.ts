@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifiedRouteImport } from './routes/verified'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoutineRouteImport } from './routes/routine'
@@ -25,6 +26,11 @@ import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
+const VerifiedRoute = VerifiedRouteImport.update({
+  id: '/verified',
+  path: '/verified',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/routine': typeof RoutineRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/verified': typeof VerifiedRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/routine': typeof RoutineRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/verified': typeof VerifiedRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/routine': typeof RoutineRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/verified': typeof VerifiedRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/routine'
     | '/settings'
     | '/signup'
+    | '/verified'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/routine'
     | '/settings'
     | '/signup'
+    | '/verified'
   id:
     | '__root__'
     | '/'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/routine'
     | '/settings'
     | '/signup'
+    | '/verified'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -223,10 +235,18 @@ export interface RootRouteChildren {
   RoutineRoute: typeof RoutineRoute
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
+  VerifiedRoute: typeof VerifiedRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verified': {
+      id: '/verified'
+      path: '/verified'
+      fullPath: '/verified'
+      preLoaderRoute: typeof VerifiedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -351,6 +371,7 @@ const rootRouteChildren: RootRouteChildren = {
   RoutineRoute: RoutineRoute,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
+  VerifiedRoute: VerifiedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
