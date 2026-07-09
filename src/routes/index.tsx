@@ -231,6 +231,6 @@ function Welcome() {
         </div>
         <p className="mt-6 text-center text-[11px] text-muted-foreground">© 2026 BeautyAI · Cosmetic guidance only</p>
       </section>
-    </div>
+    </main>
   );
 }
