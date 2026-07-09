@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import {
   requestPasswordReset,
+  signInWithApple,
   signInWithGoogle,
   signInWithPassword,
   signUpWithPassword,
@@ -41,6 +42,7 @@ export function AuthShell({ mode }: { mode: "login" | "signup" | "forgot" }) {
   const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  const [appleSubmitting, setAppleSubmitting] = useState(false);
   const [awaitingEmailConfirmation, setAwaitingEmailConfirmation] = useState(false);
 
   const title =
@@ -107,6 +109,19 @@ export function AuthShell({ mode }: { mode: "login" | "signup" | "forgot" }) {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-in failed. Please try again.");
       setGoogleSubmitting(false);
+    }
+  };
+
+  const handleApple = async () => {
+    setError(null);
+    setAppleSubmitting(true);
+    try {
+      await signInWithApple();
+      nav({ to: "/home" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Apple sign-in failed. Please try again.");
+    } finally {
+      setAppleSubmitting(false);
     }
   };
 
@@ -217,6 +232,14 @@ export function AuthShell({ mode }: { mode: "login" | "signup" | "forgot" }) {
                   className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card text-[15px] font-medium disabled:opacity-60"
                 >
                   {googleSubmitting ? "Opening Google…" : "Continue with Google"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApple}
+                  disabled={appleSubmitting}
+                  className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card text-[15px] font-medium disabled:opacity-60"
+                >
+                  {appleSubmitting ? "Opening Apple…" : "Continue with Apple"}
                 </button>
               </>
             )}

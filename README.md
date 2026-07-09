@@ -42,6 +42,44 @@ are the only ones bundled into the client; everything else is server-only.
    (this is what lets the OAuth flow hand control back to the iOS app —
    see `src/lib/capacitor/deep-link.ts`).
 
+### Sign in with Apple
+
+On iOS this uses the native AuthenticationServices flow (Face ID/Touch ID
+prompt, no browser hop) via `@capacitor-community/apple-sign-in`, exchanging
+the identity token directly with Supabase (`signInWithIdToken`). On web it
+falls back to a normal OAuth redirect, same as Google. See
+`src/lib/auth-client.ts`'s `signInWithApple`.
+
+1. **Apple Developer → Certificates, Identifiers & Profiles → Identifiers**:
+   open the `com.beautyai.app` App ID and enable the **Sign In with Apple**
+   capability.
+2. **Identifiers → Services IDs**: create a new Services ID (e.g.
+   `com.beautyai.app.web`) for the web OAuth fallback. Configure it with:
+   - Primary App ID: `com.beautyai.app`
+   - Domain: your deployed app's domain (e.g. `your-app.example.com`)
+   - Return URL: `https://YOUR_PROJECT.supabase.co/auth/v1/callback`
+
+   If you use a Services ID other than `com.beautyai.app.web`, update
+   `APPLE_SERVICES_ID` in `src/lib/auth-client.ts`.
+3. **Keys**: create a new key with **Sign In with Apple** enabled, associated
+   with the Services ID above. Download the `.p8` file (only downloadable
+   once) and note its **Key ID**, plus your **Team ID** (top right of the
+   Apple Developer site).
+4. In **Supabase → Authentication → Providers → Apple**, enable the provider
+   and set:
+   - **Client IDs**: `com.beautyai.app,com.beautyai.app.web` (comma-separated
+     — the bundle ID covers native sign-in, the Services ID covers the web
+     OAuth fallback)
+   - **Secret Key**: paste your Team ID, Key ID, and the `.p8` private key
+     contents where Supabase's UI asks for them (it signs the client secret
+     JWT for you).
+5. Under Authentication → URL Configuration, confirm
+   `com.beautyai.app://auth-callback` is in the allowed redirect URLs (it's
+   already there from the Google setup above — reused for Apple's web
+   fallback too).
+6. In Xcode, add the **Sign In with Apple** capability to the App target
+   (Signing & Capabilities → + Capability). No Info.plist entry is required.
+
 ## 3. Claude (Anthropic)
 
 Set `ANTHROPIC_API_KEY`. Used for:
