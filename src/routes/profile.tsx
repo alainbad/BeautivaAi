@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { MobileShell, ScreenHeader } from "@/components/mobile-shell";
 import { GlassCard } from "@/components/ui-primitives";
-import { ChevronRight, LogOut, CreditCard, Bell, LineChart, MessageCircleHeart, Shield, Settings as SettingsIcon } from "lucide-react";
+import { Camera, ChevronRight, LogOut, CreditCard, LineChart, MessageCircleHeart, Shield, Settings as SettingsIcon, Trash2 } from "lucide-react";
+
+const AVATAR_STORAGE_KEY = "beautyai:profile-avatar";
 
 export const Route = createFileRoute("/profile")({
   component: ProfilePage,
