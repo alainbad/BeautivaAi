@@ -108,11 +108,11 @@ function ProfilePage() {
             aria-label="Upload profile photo"
             className="group relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-gradient-blush focus:outline-none focus:ring-2 focus:ring-rose-gold"
           >
-            {avatar ? (
-              <img src={avatar} alt="Profile" className="h-full w-full object-cover" />
+            {shownAvatar ? (
+              <img src={shownAvatar} alt="Profile" className="h-full w-full object-cover" />
             ) : (
               <span className="flex h-full w-full items-center justify-center font-display text-2xl font-semibold text-rose-gold">
-                S
+                {initial}
               </span>
             )}
             <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 bg-black/45 py-1 text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100">
@@ -130,12 +130,19 @@ function ProfilePage() {
             }}
           />
           <div className="flex-1">
-            <p className="font-display text-lg font-semibold">Sofia Laurent</p>
-            <p className="text-xs text-muted-foreground">sofia@beautyai.app</p>
+            <p className="font-display text-lg font-semibold">{displayName}</p>
+            <p className="text-xs text-muted-foreground">{user?.email ?? ""}</p>
             <div className="mt-1 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-rose px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                Premium
-              </span>
+              {pro ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-rose px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                  Pro
+                </span>
+              ) : (
+                <Link to="/pricing" className="inline-flex items-center gap-1 rounded-full border border-rose-gold/40 px-2 py-0.5 text-[10px] font-semibold text-rose-gold">
+                  Upgrade to Pro
+                </Link>
+              )}
+
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
