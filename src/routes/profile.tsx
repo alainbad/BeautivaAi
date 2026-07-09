@@ -24,6 +24,12 @@ export const Route = createFileRoute("/profile")({
 function ProfilePage() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
+  const { user, isAuthenticated, loading } = useAuth();
+  const { data: profile } = useProfile(user);
+  const { data: sub } = useSubscription(user);
+  const signOut = useSignOut();
+  const pro = isPro(sub);
 
   useEffect(() => {
     try {
@@ -56,6 +62,39 @@ function ProfilePage() {
     } catch {}
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate({ to: "/login" });
+  };
+
+  const shownAvatar = avatar ?? profile?.avatar_url ?? null;
+  const displayName = profile?.display_name ?? user?.user_metadata?.full_name ?? user?.email?.split("@")[0] ?? "Guest";
+  const initial = (displayName?.[0] ?? "G").toUpperCase();
+
+  // Not signed in — show CTA
+  if (!loading && !isAuthenticated) {
+    return (
+      <MobileShell>
+        <ScreenHeader title="Profile" subtitle="Sign in to sync across devices." />
+        <section className="px-6">
+          <GlassCard className="text-center">
+            <p className="font-display text-lg font-semibold">You're not signed in</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Create a free account to save your routine, track progress, and unlock Pro features.
+            </p>
+            <Link
+              to="/login"
+              className="mt-4 flex h-12 items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground text-[15px] font-medium shadow-md shadow-rose-gold/30"
+            >
+              Sign in or create account
+            </Link>
+          </GlassCard>
+        </section>
+      </MobileShell>
+    );
+  }
+
 
   return (
     <MobileShell>
