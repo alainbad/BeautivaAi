@@ -38,7 +38,6 @@ const ALLERGIES = ["Fragrance", "Essential oils", "Nuts", "Nickel", "None"];
 const BUDGETS = ["Budget-friendly", "Mid-range", "Premium", "Luxury"];
 
 type BeautyProfileForm = {
-  dateOfBirth: string;
   ageRange: string;
   skinType: string;
   skinConcerns: string[];
@@ -49,7 +48,6 @@ type BeautyProfileForm = {
 
 function formFromProfile(profile: Profile | null | undefined): BeautyProfileForm {
   return {
-    dateOfBirth: profile?.date_of_birth ?? "",
     ageRange: profile?.age_range ?? "",
     skinType: profile?.skin_type ?? "",
     skinConcerns: profile?.skin_concerns ?? [],
@@ -104,7 +102,6 @@ function ProfilePage() {
       unwrap(
         upsertProfile({
           data: {
-            dateOfBirth: form.dateOfBirth || undefined,
             ageRange: form.ageRange || undefined,
             skinType: form.skinType || undefined,
             skinConcerns: form.skinConcerns,
@@ -175,15 +172,6 @@ function ProfilePage() {
 
         {editing ? (
           <GlassCard className="space-y-4">
-            <FormField label="Date of birth">
-              <input
-                type="date"
-                value={form.dateOfBirth}
-                onChange={(e) => setForm((prev) => ({ ...prev, dateOfBirth: e.target.value }))}
-                className="h-11 w-full rounded-xl border border-border bg-card px-3 text-sm outline-none focus:border-rose-gold"
-              />
-            </FormField>
-
             <FormField label="Age range">
               <select
                 value={form.ageRange}
@@ -282,18 +270,6 @@ function ProfilePage() {
           </GlassCard>
         ) : (
           <GlassCard className="p-0">
-            <ProfileRow
-              label="Date of birth"
-              value={
-                profile?.date_of_birth
-                  ? new Date(profile.date_of_birth).toLocaleDateString(undefined, {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })
-                  : "—"
-              }
-            />
             <ProfileRow label="Age range" value={profile?.age_range || "—"} />
             <ProfileRow label="Skin type" value={profile?.skin_type || "—"} />
             <ProfileRow label="Concerns" value={profile?.skin_concerns?.join(", ") || "—"} />
