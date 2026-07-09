@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { MobileShell, ScreenHeader } from "@/components/mobile-shell";
 import { Pill } from "@/components/ui-primitives";
-import { products } from "@/lib/mock-data";
-import { Bookmark, Star, SlidersHorizontal } from "lucide-react";
+import { products, luxuryPicks } from "@/lib/mock-data";
+import { Bookmark, Star, SlidersHorizontal, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/products")({
   component: ProductsPage,
@@ -29,7 +29,50 @@ function ProductsPage() {
         }
       />
 
-      <section className="px-6">
+      {/* Luxury picks carousel */}
+      <section className="mt-1">
+        <div className="flex items-center justify-between px-6">
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-rose-gold" />
+            <h2 className="font-display text-sm font-semibold tracking-wide">Luxury picks</h2>
+          </div>
+          <span className="text-[11px] uppercase tracking-widest text-muted-foreground">Prestige</span>
+        </div>
+        <div className="mt-3 -mx-6 overflow-x-auto pl-6">
+          <div className="flex gap-3 pr-6">
+            {luxuryPicks.map((p) => (
+              <article
+                key={p.id}
+                className="relative w-44 shrink-0 overflow-hidden rounded-3xl border border-rose-gold/30 bg-gradient-to-b from-blush/60 to-card p-3 shadow-sm"
+              >
+                <div className="flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-white/70">
+                  <img
+                    src={p.image}
+                    alt={`${p.brand} ${p.name}`}
+                    loading="lazy"
+                    className="h-full w-full object-contain p-2 mix-blend-multiply"
+                  />
+                </div>
+                <div className="mt-2 flex items-center justify-between">
+                  <p className="text-[10px] uppercase tracking-widest text-rose-gold font-semibold">{p.brand}</p>
+                  <span className="text-[10px] text-muted-foreground">{p.match}%</span>
+                </div>
+                <h3 className="font-display text-[13px] font-semibold leading-tight line-clamp-2">{p.name}</h3>
+                <div className="mt-1.5 flex items-center justify-between">
+                  <span className="text-xs font-medium">{p.price}</span>
+                  <div className="flex items-center gap-0.5 text-[11px]">
+                    <Star className="h-3 w-3 fill-rose-gold text-rose-gold" />
+                    <span>{p.rating}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-6 px-6">
+        <h2 className="mb-3 font-display text-sm font-semibold tracking-wide">Everyday essentials</h2>
         <div className="-mx-6 overflow-x-auto pl-6">
           <div className="flex gap-2 pr-6">
             {categories.map((c) => (
@@ -48,6 +91,7 @@ function ProductsPage() {
           </div>
         </div>
       </section>
+
 
       <section className="mt-5 px-6 space-y-3">
         {filtered.map((p) => {
