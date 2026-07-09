@@ -193,13 +193,15 @@ function ProfilePage() {
       </section>
 
       <section className="mt-6 px-6">
-        <Link
-          to="/"
+        <button
+          type="button"
+          onClick={handleSignOut}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card text-sm font-medium text-foreground/80"
         >
           <LogOut className="h-4 w-4" /> Log out
-        </Link>
+        </button>
       </section>
+
     </MobileShell>
   );
 }
