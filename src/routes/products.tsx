@@ -57,7 +57,14 @@ function ProductsPage() {
               key={p.id}
               className="flex gap-3 rounded-3xl border border-border/60 bg-card p-3 shadow-sm"
             >
-              <div className="h-28 w-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-blush" />
+              <div className="h-28 w-24 shrink-0 overflow-hidden rounded-2xl bg-gradient-blush">
+                <img
+                  src={p.image}
+                  alt={`${p.brand} ${p.name}`}
+                  loading="lazy"
+                  className="h-full w-full object-contain p-2 mix-blend-multiply"
+                />
+              </div>
               <div className="flex flex-1 flex-col">
                 <div className="flex items-start justify-between gap-2">
                   <div>
