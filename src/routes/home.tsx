@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { MobileShell, ScreenHeader } from "@/components/mobile-shell";
 import { GlassCard, ScoreRing, Pill } from "@/components/ui-primitives";
 import { skinScore, lastAnalysisDate, morningRoutine, eveningRoutine, products, reminders, progressTimeline } from "@/lib/mock-data";
-import { Bell, ChevronRight, Sparkles, Sun, Moon, TrendingUp } from "lucide-react";
+import { Bell, ChevronRight, Sparkles, Sun, Moon, TrendingUp, Wand2 } from "lucide-react";
 
 export const Route = createFileRoute("/home")({
   component: Home,
