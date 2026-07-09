@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RoutineRouteImport } from './routes/routine'
+import { Route as ProductsRouteImport } from './routes/products'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
@@ -26,6 +27,11 @@ const SignupRoute = SignupRouteImport.update({
 const RoutineRoute = RoutineRouteImport.update({
   id: '/routine',
   path: '/routine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/products': typeof ProductsRoute
   '/routine': typeof RoutineRoute
   '/signup': typeof SignupRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/products': typeof ProductsRoute
   '/routine': typeof RoutineRoute
   '/signup': typeof SignupRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/products': typeof ProductsRoute
   '/routine': typeof RoutineRoute
   '/signup': typeof SignupRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/login'
     | '/onboarding'
+    | '/products'
     | '/routine'
     | '/signup'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/login'
     | '/onboarding'
+    | '/products'
     | '/routine'
     | '/signup'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/login'
     | '/onboarding'
+    | '/products'
     | '/routine'
     | '/signup'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
+  ProductsRoute: typeof ProductsRoute
   RoutineRoute: typeof RoutineRoute
   SignupRoute: typeof SignupRoute
 }
@@ -148,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/routine'
       fullPath: '/routine'
       preLoaderRoute: typeof RoutineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
+  ProductsRoute: ProductsRoute,
   RoutineRoute: RoutineRoute,
   SignupRoute: SignupRoute,
 }
