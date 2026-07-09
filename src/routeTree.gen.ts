@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RoutineRouteImport } from './routes/routine'
+import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -28,6 +29,11 @@ const SignupRoute = SignupRouteImport.update({
 const RoutineRoute = RoutineRouteImport.update({
   id: '/routine',
   path: '/routine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/products': typeof ProductsRoute
   '/profile': typeof ProfileRoute
+  '/progress': typeof ProgressRoute
   '/routine': typeof RoutineRoute
   '/signup': typeof SignupRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/products': typeof ProductsRoute
   '/profile': typeof ProfileRoute
+  '/progress': typeof ProgressRoute
   '/routine': typeof RoutineRoute
   '/signup': typeof SignupRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/products': typeof ProductsRoute
   '/profile': typeof ProfileRoute
+  '/progress': typeof ProgressRoute
   '/routine': typeof RoutineRoute
   '/signup': typeof SignupRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/products'
     | '/profile'
+    | '/progress'
     | '/routine'
     | '/signup'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/products'
     | '/profile'
+    | '/progress'
     | '/routine'
     | '/signup'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/products'
     | '/profile'
+    | '/progress'
     | '/routine'
     | '/signup'
   fileRoutesById: FileRoutesById
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ProductsRoute: typeof ProductsRoute
   ProfileRoute: typeof ProfileRoute
+  ProgressRoute: typeof ProgressRoute
   RoutineRoute: typeof RoutineRoute
   SignupRoute: typeof SignupRoute
 }
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/routine'
       fullPath: '/routine'
       preLoaderRoute: typeof RoutineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ProductsRoute: ProductsRoute,
   ProfileRoute: ProfileRoute,
+  ProgressRoute: ProgressRoute,
   RoutineRoute: RoutineRoute,
   SignupRoute: SignupRoute,
 }
