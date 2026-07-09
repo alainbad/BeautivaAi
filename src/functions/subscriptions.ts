@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { billingForProductId } from "@/lib/apple-iap-products";
 import { requireUser } from "@/server/lib/auth";
+import { getAppleSignedDataVerifier } from "@/server/lib/apple-iap";
 import { serverEnv } from "@/server/lib/env";
 import { AppError, toApiResponse } from "@/server/lib/response";
 import { getStripeClient } from "@/server/lib/stripe";
@@ -80,6 +82,56 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
       if (!session.url) throw new AppError("Stripe did not return a checkout URL.", 502);
       return { checkoutUrl: session.url };
+    }),
+  );
+
+/**
+ * subscriptionService.verifyApplePurchase — called right after a native
+ * StoreKit purchase is approved (see src/lib/capacitor/iap.ts). Verifies the
+ * signed transaction against Apple's servers before the client is allowed to
+ * `transaction.finish()`, and records the subscription. Renewals and
+ * cancellations after this point arrive via the App Store Server
+ * Notifications V2 webhook (src/server/http/apple-notifications.ts).
+ */
+export const verifyApplePurchase = createServerFn({ method: "POST" })
+  .validator(z.object({ signedTransaction: z.string().min(1) }))
+  .handler(async ({ data }) =>
+    toApiResponse(async () => {
+      const { supabase, user } = await requireUser();
+      const verifier = getAppleSignedDataVerifier();
+
+      const transaction = await verifier.verifyAndDecodeTransaction(data.signedTransaction);
+
+      const billing = transaction.productId ? billingForProductId(transaction.productId) : null;
+      if (!billing) {
+        throw new AppError(`Unrecognized product id: ${transaction.productId ?? "unknown"}`, 400);
+      }
+      if (!transaction.originalTransactionId) {
+        throw new AppError("Apple transaction is missing an originalTransactionId.", 502);
+      }
+
+      const isRevoked = transaction.revocationDate != null;
+      const isExpired = transaction.expiresDate != null && transaction.expiresDate < Date.now();
+      const status = isRevoked ? "revoked" : isExpired ? "expired" : "active";
+      const plan = status === "active" ? "premium" : "free";
+
+      const { error } = await supabase.from("subscriptions").upsert(
+        {
+          user_id: user.id,
+          plan,
+          status,
+          apple_original_transaction_id: transaction.originalTransactionId,
+          apple_product_id: transaction.productId,
+          apple_environment: transaction.environment,
+          current_period_end: transaction.expiresDate
+            ? new Date(transaction.expiresDate).toISOString()
+            : null,
+        },
+        { onConflict: "user_id" },
+      );
+      if (error) throw new AppError(error.message, 500);
+
+      return { plan, status, billing };
     }),
   );
 

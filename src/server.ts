@@ -3,6 +3,7 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { handleStripeWebhook } from "./server/http/stripe-webhook";
+import { handleAppleNotification } from "./server/http/apple-notifications";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -53,6 +54,11 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === "/api/stripe/webhook" && request.method === "POST") {
       return handleStripeWebhook(request);
+    }
+    // Apple's App Store Server Notifications V2 — same rationale as the
+    // Stripe webhook above (stable public URL, outside the RPC layer).
+    if (url.pathname === "/api/apple/notifications" && request.method === "POST") {
+      return handleAppleNotification(request);
     }
 
     try {

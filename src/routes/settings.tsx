@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 import { ArrowLeft } from "lucide-react";
 import { GlassCard } from "@/components/ui-primitives";
 import { unwrap } from "@/lib/query-helpers";
@@ -9,8 +11,10 @@ import {
   syncReminderNotifications,
 } from "@/lib/capacitor/notifications";
 import { getProfile } from "@/functions/profile";
-import { getSubscription, createBillingPortalSession } from "@/functions/subscriptions";
+import { getSubscription } from "@/functions/subscriptions";
 import { createReminder, listReminders, setReminderActive } from "@/functions/reminders";
+
+const APPLE_MANAGE_SUBSCRIPTIONS_URL = "https://apps.apple.com/account/subscriptions";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -57,10 +61,6 @@ function Settings() {
     });
   }, [remindersQuery.data]);
 
-  const portalMutation = useMutation({
-    mutationFn: () => unwrap(createBillingPortalSession()),
-  });
-
   const toggleReminderMutation = useMutation({
     mutationFn: async (title: string) => {
       const existing = remindersQuery.data?.find((r) => r.title === title);
@@ -84,8 +84,11 @@ function Settings() {
   const subscription = subscriptionQuery.data;
 
   const handleManageBilling = async () => {
-    const res = await portalMutation.mutateAsync();
-    window.location.assign(res.portalUrl);
+    if (Capacitor.isNativePlatform()) {
+      await Browser.open({ url: APPLE_MANAGE_SUBSCRIPTIONS_URL });
+    } else {
+      window.open(APPLE_MANAGE_SUBSCRIPTIONS_URL, "_blank");
+    }
   };
 
   return (
@@ -153,10 +156,9 @@ function Settings() {
               </Link>
               <button
                 onClick={handleManageBilling}
-                disabled={portalMutation.isPending}
-                className="flex h-11 items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground text-sm font-medium disabled:opacity-60"
+                className="flex h-11 items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground text-sm font-medium"
               >
-                {portalMutation.isPending ? "Opening…" : "Billing portal"}
+                Manage in App Store
               </button>
             </div>
           </GlassCard>

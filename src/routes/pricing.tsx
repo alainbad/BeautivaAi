@@ -1,11 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Capacitor } from "@capacitor/core";
-import { Browser } from "@capacitor/browser";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Check } from "lucide-react";
 import { unwrap } from "@/lib/query-helpers";
-import { getSubscription, createCheckoutSession } from "@/functions/subscriptions";
+import { getSubscription } from "@/functions/subscriptions";
+import {
+  isIapAvailable,
+  purchasePremium,
+  restorePurchases,
+  setIapPurchaseListener,
+} from "@/lib/capacitor/iap";
 
 export const Route = createFileRoute("/pricing")({
   component: Pricing,
@@ -48,26 +52,48 @@ const perks = {
 
 function Pricing() {
   const [billing, setBilling] = useState<"monthly" | "yearly">("yearly");
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
+  const [purchasing, setPurchasing] = useState(false);
+  const queryClient = useQueryClient();
+
   const subscriptionQuery = useQuery({
     queryKey: ["subscription"],
     queryFn: () => unwrap(getSubscription()),
   });
   const isPremium = subscriptionQuery.data?.plan === "premium";
+  const available = isIapAvailable();
 
-  const checkoutMutation = useMutation({
-    mutationFn: () =>
-      unwrap(
-        createCheckoutSession({
-          data: { billing, platform: Capacitor.isNativePlatform() ? "ios" : "web" },
-        }),
-      ),
-    onSuccess: async (res) => {
-      if (Capacitor.isNativePlatform()) {
-        await Browser.open({ url: res.checkoutUrl });
-      } else {
-        window.location.assign(res.checkoutUrl);
-      }
-    },
+  useEffect(() => {
+    setIapPurchaseListener({
+      onVerified: () => {
+        setPurchasing(false);
+        setPurchaseError(null);
+        queryClient.invalidateQueries({ queryKey: ["subscription"] });
+      },
+      onError: (message) => {
+        setPurchasing(false);
+        setPurchaseError(message);
+      },
+    });
+    return () => setIapPurchaseListener(null);
+  }, [queryClient]);
+
+  const handleUpgrade = async () => {
+    setPurchaseError(null);
+    setPurchasing(true);
+    try {
+      await purchasePremium(billing);
+      // Resolution (success or failure) arrives async via the listener above
+      // once StoreKit reports the transaction as approved.
+    } catch (err) {
+      setPurchasing(false);
+      setPurchaseError(err instanceof Error ? err.message : "Purchase failed. Please try again.");
+    }
+  };
+
+  const restoreMutation = useMutation({
+    mutationFn: restorePurchases,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["subscription"] }),
   });
 
   return (
@@ -87,6 +113,13 @@ function Pricing() {
         <p className="text-sm text-muted-foreground">
           Start free. Upgrade whenever you're ready to glow further.
         </p>
+
+        {!available && (
+          <div className="mt-4 rounded-2xl border border-border bg-card px-4 py-3 text-xs text-muted-foreground">
+            Premium is available in the BeautyAI iOS app via the App Store. Open the app on your
+            iPhone to upgrade.
+          </div>
+        )}
 
         <div className="mt-5 flex items-center rounded-2xl border border-border bg-card p-1 text-sm">
           {(["monthly", "yearly"] as const).map((b) => (
@@ -149,27 +182,37 @@ function Pricing() {
                 </li>
               ))}
             </ul>
-            {checkoutMutation.error && (
-              <p className="mt-3 text-xs font-medium text-destructive">
-                {checkoutMutation.error.message}
-              </p>
+            {purchaseError && (
+              <p className="mt-3 text-xs font-medium text-destructive">{purchaseError}</p>
             )}
             <button
-              onClick={() => checkoutMutation.mutate()}
-              disabled={isPremium || checkoutMutation.isPending}
+              onClick={handleUpgrade}
+              disabled={isPremium || purchasing || !available}
               className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-foreground text-background text-sm font-semibold disabled:opacity-60"
             >
-              {isPremium
-                ? "You're on Premium"
-                : checkoutMutation.isPending
-                  ? "Redirecting…"
-                  : "Upgrade to Premium"}
+              {isPremium ? "You're on Premium" : purchasing ? "Processing…" : "Upgrade to Premium"}
             </button>
           </div>
         </div>
 
+        {available && !isPremium && (
+          <button
+            onClick={() => restoreMutation.mutate()}
+            disabled={restoreMutation.isPending}
+            className="mt-4 w-full text-center text-xs font-medium text-muted-foreground underline disabled:opacity-60"
+          >
+            {restoreMutation.isPending ? "Restoring…" : "Restore purchases"}
+          </button>
+        )}
+        {restoreMutation.error && (
+          <p className="mt-2 text-center text-xs font-medium text-destructive">
+            {restoreMutation.error.message}
+          </p>
+        )}
+
         <p className="mt-6 pb-10 text-center text-[11px] text-muted-foreground">
-          Subscription auto-renews. Manage or cancel anytime in your Profile.
+          Subscription auto-renews through the App Store. Manage or cancel anytime in your iPhone
+          Settings → your name → Subscriptions.
         </p>
       </section>
     </div>

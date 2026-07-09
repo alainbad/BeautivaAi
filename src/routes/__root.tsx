@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { initNativeDeepLinks } from "../lib/capacitor/deep-link";
+import { initIap } from "../lib/capacitor/iap";
 
 function NotFoundComponent() {
   return (
@@ -141,6 +142,7 @@ function RootComponent() {
         status === "success" ? "/pricing?checkout=success" : "/pricing?checkout=cancel",
       );
     });
+    void initIap();
   }, []);
 
   return (

@@ -38,4 +38,26 @@ export const serverEnv = {
   get appUrl() {
     return process.env.APP_URL ?? "http://localhost:3000";
   },
+  get appleIapIssuerId() {
+    return required("APPLE_IAP_ISSUER_ID");
+  },
+  get appleIapKeyId() {
+    return required("APPLE_IAP_KEY_ID");
+  },
+  get appleIapPrivateKey() {
+    // Contents of the .p8 in-app-purchase key downloaded from App Store
+    // Connect. If the env var holds literal "\n" escapes (common when
+    // pasting a multi-line PEM into a single-line .env value), unescape them.
+    return required("APPLE_IAP_PRIVATE_KEY").replace(/\\n/g, "\n");
+  },
+  get appleIapBundleId() {
+    return process.env.APPLE_IAP_BUNDLE_ID ?? "com.beautyai.app";
+  },
+  get appleIapAppAppleId() {
+    const value = process.env.APPLE_IAP_APP_APPLE_ID;
+    return value ? Number(value) : undefined;
+  },
+  get appleIapEnvironment(): "Sandbox" | "Production" {
+    return process.env.APPLE_IAP_ENVIRONMENT === "Production" ? "Production" : "Sandbox";
+  },
 };
