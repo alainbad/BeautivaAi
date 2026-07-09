@@ -27,10 +27,10 @@ export function AuthShell({ mode }: { mode: "login" | "signup" | "forgot" }) {
       ? "Start with a free analysis in under two minutes."
       : "We'll send you a reset link.";
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col bg-background safe-x">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-background safe-x">
       <header className="safe-top flex items-center gap-3 px-6 pt-4">
         <Link to="/" className="flex h-9 w-9 items-center justify-center rounded-full bg-card border border-border">
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </Link>
         <div className="flex items-center gap-1.5 text-rose-gold">
           <Sparkles className="h-4 w-4" />

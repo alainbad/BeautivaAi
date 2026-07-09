@@ -32,10 +32,10 @@ const sections = [
 
 function Admin() {
   return (
-    <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background safe-x pb-10">
+    <div className="mx-auto min-h-dvh w-full max-w-[430px] bg-background safe-x pb-10">
       <header className="safe-top flex items-center gap-3 px-6 pt-4 pb-3">
-        <Link to="/profile" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
-          <ArrowLeft className="h-4 w-4" />
+        <Link to="/profile" aria-label="Go back" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </Link>
         <div>
           <h1 className="font-display text-2xl font-semibold">Admin</h1>

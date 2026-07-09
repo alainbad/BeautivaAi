@@ -21,8 +21,8 @@ function ProgressPage() {
   return (
     <MobileShell>
       <header className="safe-top flex items-center gap-3 px-6 pt-4 pb-3">
-        <Link to="/home" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
-          <ArrowLeft className="h-4 w-4" />
+        <Link to="/home" aria-label="Go back" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </Link>
         <div>
           <h1 className="font-display text-2xl font-semibold">Progress</h1>
