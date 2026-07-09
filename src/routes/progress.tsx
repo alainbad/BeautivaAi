@@ -6,14 +6,23 @@ import { progressTimeline } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/progress")({
   component: ProgressPage,
+  head: () => ({
+    meta: [
+      { title: "Progress — BeautyAI" },
+      { name: "description", content: "Track your skin's transformation over time with weekly photos and scores." },
+      { property: "og:title", content: "Progress — BeautyAI" },
+      { property: "og:description", content: "Track your skin's transformation over time with weekly photos and scores." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 function ProgressPage() {
   return (
     <MobileShell>
       <header className="safe-top flex items-center gap-3 px-6 pt-4 pb-3">
-        <Link to="/home" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
-          <ArrowLeft className="h-4 w-4" />
+        <Link to="/home" aria-label="Go back" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </Link>
         <div>
           <h1 className="font-display text-2xl font-semibold">Progress</h1>

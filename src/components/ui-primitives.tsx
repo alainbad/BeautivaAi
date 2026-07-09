@@ -38,13 +38,34 @@ export function DisclaimerBox({ children }: { children: ReactNode }) {
   );
 }
 
-export function EmptyState({ title, description, icon }: { title: string; description: string; icon?: ReactNode }) {
+export function EmptyState({
+  title,
+  description,
+  icon,
+  action,
+}: {
+  title: string;
+  description: string;
+  icon?: ReactNode;
+  action?: ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border bg-card/50 px-6 py-10 text-center">
-      {icon ? <div className="text-primary">{icon}</div> : null}
+      {icon ? <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blush/50 text-rose-gold">{icon}</div> : null}
       <h3 className="font-display text-lg font-semibold">{title}</h3>
       <p className="max-w-xs text-sm text-muted-foreground">{description}</p>
+      {action ? <div className="mt-1">{action}</div> : null}
     </div>
+  );
+}
+
+export function Skeleton({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`animate-pulse rounded-2xl bg-gradient-to-r from-muted via-blush/40 to-muted bg-[length:200%_100%] ${className}`}
+      style={{ animation: "shimmer 1.6s ease-in-out infinite" }}
+      aria-hidden="true"
+    />
   );
 }
 

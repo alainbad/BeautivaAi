@@ -1,9 +1,17 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import onboardingArt from "@/assets/onboarding-illustration.png";
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
+  head: () => ({
+    meta: [
+      { title: "Get started — BeautyAI" },
+      { name: "description", content: "Answer a few questions so BeautyAI can tailor your skincare routine and product recommendations." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 type Step = {
@@ -47,13 +55,24 @@ function Onboarding() {
   const back = () => (idx > 0 ? setIdx(idx - 1) : nav({ to: "/signup" }));
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col bg-background safe-x">
+    <main className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-background safe-x">
       <header className="safe-top flex items-center gap-3 px-6 pt-4">
-        <button onClick={back} className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
-          <ArrowLeft className="h-4 w-4" />
+        <button
+          onClick={back}
+          aria-label="Go back"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </button>
         <div className="flex-1">
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={steps.length}
+            aria-valuenow={idx + 1}
+            aria-label={`Step ${idx + 1} of ${steps.length}`}
+            className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+          >
             <div
               className="h-full bg-gradient-rose transition-all"
               style={{ width: `${((idx + 1) / steps.length) * 100}%` }}
@@ -63,12 +82,24 @@ function Onboarding() {
         <Link to="/home" className="text-xs text-muted-foreground">Skip</Link>
       </header>
 
-      <div className="flex-1 px-6 pt-8">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-gold">
+      <div className="flex-1 px-6 pt-6">
+        {idx === 0 ? (
+          <div className="flex justify-center">
+            <img
+              src={onboardingArt}
+              alt=""
+              width={1024}
+              height={1024}
+              className="h-32 w-32 opacity-90"
+            />
+          </div>
+        ) : null}
+        <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-gold">
           Step {idx + 1} of {steps.length}
         </p>
         <h1 className="mt-2 font-display text-3xl font-semibold">{step.question}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{step.helper}</p>
+
 
         <div className="mt-6 grid grid-cols-2 gap-2.5">
           {step.options.map((opt) => {
@@ -101,6 +132,6 @@ function Onboarding() {
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>
-    </div>
+    </main>
   );
 }

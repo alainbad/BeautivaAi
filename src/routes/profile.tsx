@@ -5,6 +5,15 @@ import { ChevronRight, LogOut, CreditCard, Bell, LineChart, MessageCircleHeart, 
 
 export const Route = createFileRoute("/profile")({
   component: ProfilePage,
+  head: () => ({
+    meta: [
+      { title: "Profile — BeautyAI" },
+      { name: "description", content: "Your BeautyAI profile: skin type, concerns, goals, and preferences." },
+      { property: "og:title", content: "Profile — BeautyAI" },
+      { property: "og:description", content: "Your BeautyAI profile: skin type, concerns, goals, and preferences." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 function ProfilePage() {

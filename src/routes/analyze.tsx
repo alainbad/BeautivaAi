@@ -7,6 +7,15 @@ import { Camera, Image as ImageIcon, Sparkles, RefreshCw, Check } from "lucide-r
 
 export const Route = createFileRoute("/analyze")({
   component: Analyze,
+  head: () => ({
+    meta: [
+      { title: "Skin Analysis — BeautyAI" },
+      { name: "description", content: "Upload a selfie to get your AI-powered skin score and cosmetic breakdown." },
+      { property: "og:title", content: "Skin Analysis — BeautyAI" },
+      { property: "og:description", content: "Upload a selfie to get your AI-powered skin score and cosmetic breakdown." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 type Phase = "intro" | "preview" | "loading" | "result";

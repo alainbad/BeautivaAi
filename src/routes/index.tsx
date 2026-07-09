@@ -1,8 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Camera, ListChecks, ShoppingBag, LineChart, Bell, MessageCircleHeart, ChevronRight, Star } from "lucide-react";
+import heroImage from "@/assets/hero-beauty.jpg";
 
 export const Route = createFileRoute("/")({
   component: Welcome,
+  head: () => ({
+    meta: [
+      { title: "BeautyAI — AI Skin Analysis & Personalized Skincare Routines" },
+      { name: "description", content: "Get a personalized skincare routine from a single selfie. AI-powered skin analysis, product matches, and progress tracking — built for glow." },
+      { property: "og:title", content: "BeautyAI — AI Skin Analysis & Personalized Skincare" },
+      { property: "og:description", content: "Analyze your skin, build your routine, track your progress, and discover products made for you." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "/" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+  }),
 });
 
 const features = [
@@ -35,16 +47,16 @@ const faqs = [
 
 function Welcome() {
   return (
-    <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background safe-x">
+    <main className="mx-auto min-h-dvh w-full max-w-[430px] bg-background safe-x">
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-blush opacity-90" />
-        <div className="absolute -top-20 -right-16 h-64 w-64 rounded-full bg-rose-gold/40 blur-3xl" />
-        <div className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-lavender/50 blur-3xl" />
+      <section className="relative overflow-hidden" aria-labelledby="hero-heading">
+        <div className="absolute inset-0 bg-gradient-blush opacity-90" aria-hidden="true" />
+        <div className="absolute -top-20 -right-16 h-64 w-64 rounded-full bg-rose-gold/40 blur-3xl" aria-hidden="true" />
+        <div className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-lavender/50 blur-3xl" aria-hidden="true" />
         <div className="relative safe-top px-6 pt-8 pb-14">
-          <div className="flex items-center justify-between">
+          <nav className="flex items-center justify-between" aria-label="Primary">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-white/60 backdrop-blur">
+              <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-white/60 backdrop-blur" aria-hidden="true">
                 <Sparkles className="h-4 w-4 text-rose-gold" />
               </span>
               <span className="font-display text-lg font-semibold">BeautyAI</span>
@@ -52,13 +64,26 @@ function Welcome() {
             <Link to="/login" className="text-sm font-medium text-foreground/80">
               Log in
             </Link>
+          </nav>
+
+          <div className="mt-10 flex justify-center">
+            <div className="relative h-56 w-56 overflow-hidden rounded-[2rem] shadow-xl shadow-rose-gold/30 ring-1 ring-white/50">
+              <img
+                src={heroImage}
+                alt="Radiant glowing skin — BeautyAI helps you build a routine that works"
+                width={1024}
+                height={1280}
+                className="h-full w-full object-cover"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-blush/40 via-transparent to-transparent" />
+            </div>
           </div>
 
-          <div className="mt-14">
+          <div className="mt-8 animate-fade-up">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1 text-[11px] font-medium text-foreground/70 backdrop-blur">
-              <Sparkles className="h-3 w-3" /> Powered by AI Vision
+              <Sparkles className="h-3 w-3" aria-hidden="true" /> Powered by AI Vision
             </span>
-            <h1 className="mt-4 font-display text-[40px] leading-[1.05] font-semibold text-foreground">
+            <h1 id="hero-heading" className="mt-4 font-display text-[40px] leading-[1.05] font-semibold text-foreground">
               Your personal <span className="text-gradient-rose italic">AI beauty</span> assistant.
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-foreground/75">
@@ -83,13 +108,13 @@ function Welcome() {
       </section>
 
       {/* Feature cards */}
-      <section id="features" className="px-6 py-10">
+      <section id="features" className="px-6 py-10" aria-labelledby="features-heading">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-rose-gold">Features</p>
-        <h2 className="mt-1 font-display text-2xl font-semibold">Everything your skin needs</h2>
+        <h2 id="features-heading" className="mt-1 font-display text-2xl font-semibold">Everything your skin needs</h2>
         <div className="mt-5 grid grid-cols-2 gap-3">
           {features.map((f) => (
             <div key={f.title} className="rounded-3xl border border-border/60 bg-card p-4 shadow-sm">
-              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blush/50 text-rose-gold">
+              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-blush/50 text-rose-gold" aria-hidden="true">
                 <f.icon className="h-4 w-4" />
               </span>
               <h3 className="mt-3 font-display text-[15px] font-semibold leading-tight">{f.title}</h3>
@@ -206,6 +231,6 @@ function Welcome() {
         </div>
         <p className="mt-6 text-center text-[11px] text-muted-foreground">© 2026 BeautyAI · Cosmetic guidance only</p>
       </section>
-    </div>
+    </main>
   );
 }
