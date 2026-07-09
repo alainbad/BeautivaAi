@@ -132,6 +132,6 @@ function Onboarding() {
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>
-    </div>
+    </main>
   );
 }
