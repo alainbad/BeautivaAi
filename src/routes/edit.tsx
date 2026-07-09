@@ -1,11 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MobileShell, ScreenHeader } from "@/components/mobile-shell";
 import { GlassCard } from "@/components/ui-primitives";
+import { useAuth, useSubscription, isPro } from "@/hooks/use-auth";
 import {
   Camera,
   Download,
   ImagePlus,
+  Lock,
   RotateCcw,
   Sparkles,
   Trash2,
@@ -118,6 +120,9 @@ function buildFilter(a: Adjust) {
 }
 
 function EditPage() {
+  const { user } = useAuth();
+  const { data: sub } = useSubscription(user);
+  const pro = isPro(sub);
   const [image, setImage] = useState<string | null>(null);
   const [presetId, setPresetId] = useState<string>("original");
   const [adjust, setAdjust] = useState<Adjust>(DEFAULT_ADJUST);
@@ -400,42 +405,120 @@ function EditPage() {
       </section>
 
       <section className="mt-6 px-6">
-        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-4">
-          <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground">
-              <Wand2 className="h-5 w-5" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="font-display text-lg font-semibold">AI Retouch</h2>
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${pro ? "bg-gradient-rose text-primary-foreground" : "bg-lavender/70 text-foreground/70"}`}>
+              {pro ? "Premium" : "Pro"}
             </span>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <p className="font-display text-[15px] font-semibold">AI retouch</p>
-                <span className="rounded-full bg-lavender/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/70">
-                  Coming soon
-                </span>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Smart blemish removal, teeth whitening, eye brighten, and glow-up
-                — powered by Lovable AI.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {["Blemish fix", "Whiten teeth", "Brighten eyes", "Glow up", "Reshape"].map(
-                  (t) => (
-                    <span
-                      key={t}
-                      className="rounded-full border border-border/60 bg-background px-2.5 py-1 text-[11px] text-muted-foreground"
-                    >
-                      {t}
-                    </span>
-                  ),
-                )}
+          </div>
+          {!pro ? (
+            <Link to="/pricing" className="text-[11px] font-semibold text-rose-gold">
+              Unlock →
+            </Link>
+          ) : null}
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Enhanced editing powered by AI. Tap a tool to apply it to your photo.
+        </p>
+
+        <div className="mt-3 grid grid-cols-2 gap-2.5">
+          {[
+            { id: "blemish", label: "Blemish fix", emoji: "✨" },
+            { id: "teeth", label: "Whiten teeth", emoji: "🦷" },
+            { id: "eyes", label: "Brighten eyes", emoji: "👁️" },
+            { id: "glow", label: "Glow up", emoji: "🌟" },
+            { id: "reshape", label: "Face reshape", emoji: "💠" },
+            { id: "bg", label: "Background", emoji: "🖼️" },
+          ].map((tool) => (
+            <AiTool
+              key={tool.id}
+              label={tool.label}
+              emoji={tool.emoji}
+              locked={!pro}
+              disabled={!image}
+              onRun={() => {
+                if (!image) {
+                  alert("Upload a photo first.");
+                  return;
+                }
+                alert(`Running ${tool.label}… (AI processing will run on-device / server once wired.)`);
+              }}
+            />
+          ))}
+        </div>
+
+        {!pro ? (
+          <Link
+            to="/pricing"
+            className="mt-3 flex items-center justify-between rounded-3xl bg-gradient-rose p-4 text-primary-foreground shadow-md"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/25">
+                <Sparkles className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="font-display text-[15px] font-semibold">Unlock AI Retouch</p>
+                <p className="text-[11px] text-primary-foreground/85">$1.99/month · cancel anytime</p>
               </div>
             </div>
-            <Sparkles className="h-4 w-4 text-rose-gold" aria-hidden />
-          </div>
-        </div>
+            <span className="text-sm font-semibold">Upgrade</span>
+          </Link>
+        ) : null}
       </section>
     </MobileShell>
   );
 }
+
+function AiTool({
+  label,
+  emoji,
+  locked,
+  disabled,
+  onRun,
+}: {
+  label: string;
+  emoji: string;
+  locked: boolean;
+  disabled: boolean;
+  onRun: () => void;
+}) {
+  if (locked) {
+    return (
+      <Link
+        to="/pricing"
+        className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3"
+      >
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blush/60 text-lg">
+          {emoji}
+        </span>
+        <div className="flex-1">
+          <p className="text-[13px] font-medium">{label}</p>
+          <p className="text-[10px] text-muted-foreground">Premium</p>
+        </div>
+        <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+      </Link>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onRun}
+      disabled={disabled}
+      className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 text-left disabled:opacity-50"
+    >
+      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blush/60 text-lg">
+        {emoji}
+      </span>
+      <div className="flex-1">
+        <p className="text-[13px] font-medium">{label}</p>
+        <p className="text-[10px] text-muted-foreground">Tap to apply</p>
+      </div>
+      <Wand2 className="h-3.5 w-3.5 text-rose-gold" />
+    </button>
+  );
+}
+
 
 function Slider({
   label,
