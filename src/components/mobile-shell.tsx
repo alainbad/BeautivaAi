@@ -13,9 +13,12 @@ const tabs = [
 export function MobileShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col bg-background safe-x">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-background safe-x">
       <main className="flex-1 pb-28">{children}</main>
-      <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[430px] safe-bottom">
+      <nav
+        aria-label="Primary"
+        className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[430px] safe-bottom"
+      >
         <div className="mx-3 mb-2 rounded-3xl border border-border/60 bg-card/90 shadow-[0_8px_30px_-12px_rgba(120,60,50,0.25)] backdrop-blur-xl">
           <ul className="flex items-center justify-around px-2 py-2">
             {tabs.map((t) => {
@@ -25,6 +28,8 @@ export function MobileShell({ children }: { children: ReactNode }) {
                 <li key={t.to}>
                   <Link
                     to={t.to}
+                    aria-label={t.label}
+                    aria-current={active ? "page" : undefined}
                     className={`flex min-w-16 flex-col items-center gap-1 rounded-2xl px-3 py-1.5 transition ${
                       active ? "text-primary" : "text-warm-gray"
                     }`}
@@ -33,6 +38,7 @@ export function MobileShell({ children }: { children: ReactNode }) {
                       className={`flex h-9 w-9 items-center justify-center rounded-2xl transition ${
                         active ? "bg-gradient-rose text-primary-foreground shadow-md" : ""
                       }`}
+                      aria-hidden="true"
                     >
                       <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.8} />
                     </span>
