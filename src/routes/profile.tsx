@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { MobileShell, ScreenHeader } from "@/components/mobile-shell";
 import { GlassCard } from "@/components/ui-primitives";
 import { Camera, ChevronRight, LogOut, CreditCard, LineChart, MessageCircleHeart, Shield, Settings as SettingsIcon, Trash2 } from "lucide-react";
+import { useAuth, useProfile, useSubscription, isPro, useSignOut } from "@/hooks/use-auth";
+
 
 const AVATAR_STORAGE_KEY = "beautyai:profile-avatar";
 
@@ -22,6 +24,12 @@ export const Route = createFileRoute("/profile")({
 function ProfilePage() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
+  const { user, isAuthenticated, loading } = useAuth();
+  const { data: profile } = useProfile(user);
+  const { data: sub } = useSubscription(user);
+  const signOut = useSignOut();
+  const pro = isPro(sub);
 
   useEffect(() => {
     try {
@@ -55,6 +63,39 @@ function ProfilePage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate({ to: "/login" });
+  };
+
+  const shownAvatar = avatar ?? profile?.avatar_url ?? null;
+  const displayName = profile?.display_name ?? user?.user_metadata?.full_name ?? user?.email?.split("@")[0] ?? "Guest";
+  const initial = (displayName?.[0] ?? "G").toUpperCase();
+
+  // Not signed in — show CTA
+  if (!loading && !isAuthenticated) {
+    return (
+      <MobileShell>
+        <ScreenHeader title="Profile" subtitle="Sign in to sync across devices." />
+        <section className="px-6">
+          <GlassCard className="text-center">
+            <p className="font-display text-lg font-semibold">You're not signed in</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Create a free account to save your routine, track progress, and unlock Pro features.
+            </p>
+            <Link
+              to="/login"
+              className="mt-4 flex h-12 items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground text-[15px] font-medium shadow-md shadow-rose-gold/30"
+            >
+              Sign in or create account
+            </Link>
+          </GlassCard>
+        </section>
+      </MobileShell>
+    );
+  }
+
+
   return (
     <MobileShell>
       <ScreenHeader title="Profile" subtitle="Manage your beauty preferences." />
@@ -67,11 +108,11 @@ function ProfilePage() {
             aria-label="Upload profile photo"
             className="group relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-gradient-blush focus:outline-none focus:ring-2 focus:ring-rose-gold"
           >
-            {avatar ? (
-              <img src={avatar} alt="Profile" className="h-full w-full object-cover" />
+            {shownAvatar ? (
+              <img src={shownAvatar} alt="Profile" className="h-full w-full object-cover" />
             ) : (
               <span className="flex h-full w-full items-center justify-center font-display text-2xl font-semibold text-rose-gold">
-                S
+                {initial}
               </span>
             )}
             <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 bg-black/45 py-1 text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100">
@@ -89,12 +130,19 @@ function ProfilePage() {
             }}
           />
           <div className="flex-1">
-            <p className="font-display text-lg font-semibold">Sofia Laurent</p>
-            <p className="text-xs text-muted-foreground">sofia@beautyai.app</p>
+            <p className="font-display text-lg font-semibold">{displayName}</p>
+            <p className="text-xs text-muted-foreground">{user?.email ?? ""}</p>
             <div className="mt-1 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-rose px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                Premium
-              </span>
+              {pro ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-rose px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                  Pro
+                </span>
+              ) : (
+                <Link to="/pricing" className="inline-flex items-center gap-1 rounded-full border border-rose-gold/40 px-2 py-0.5 text-[10px] font-semibold text-rose-gold">
+                  Upgrade to Pro
+                </Link>
+              )}
+
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
@@ -145,13 +193,15 @@ function ProfilePage() {
       </section>
 
       <section className="mt-6 px-6">
-        <Link
-          to="/"
+        <button
+          type="button"
+          onClick={handleSignOut}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card text-sm font-medium text-foreground/80"
         >
           <LogOut className="h-4 w-4" /> Log out
-        </Link>
+        </button>
       </section>
+
     </MobileShell>
   );
 }

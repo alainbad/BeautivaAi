@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoutineRouteImport } from './routes/routine'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProductsRouteImport } from './routes/products'
@@ -39,6 +40,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const RoutineRoute = RoutineRouteImport.update({
   id: '/routine',
   path: '/routine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgressRoute = ProgressRouteImport.update({
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/products': typeof ProductsRoute
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/routine': typeof RoutineRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/products': typeof ProductsRoute
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/routine': typeof RoutineRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/products': typeof ProductsRoute
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/routine': typeof RoutineRoute
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/profile'
     | '/progress'
+    | '/reset-password'
     | '/routine'
     | '/settings'
     | '/signup'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/profile'
     | '/progress'
+    | '/reset-password'
     | '/routine'
     | '/settings'
     | '/signup'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/profile'
     | '/progress'
+    | '/reset-password'
     | '/routine'
     | '/settings'
     | '/signup'
@@ -233,6 +245,7 @@ export interface RootRouteChildren {
   ProductsRoute: typeof ProductsRoute
   ProfileRoute: typeof ProfileRoute
   ProgressRoute: typeof ProgressRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   RoutineRoute: typeof RoutineRoute
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/routine'
       fullPath: '/routine'
       preLoaderRoute: typeof RoutineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progress': {
@@ -369,6 +389,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsRoute: ProductsRoute,
   ProfileRoute: ProfileRoute,
   ProgressRoute: ProgressRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   RoutineRoute: RoutineRoute,
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
