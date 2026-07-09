@@ -62,7 +62,14 @@ function Home() {
                 key={p.id}
                 className="w-40 shrink-0 rounded-3xl border border-border/60 bg-card p-3 shadow-sm"
               >
-                <div className="aspect-[4/5] w-full rounded-2xl bg-gradient-blush" />
+                <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gradient-blush">
+                  <img
+                    src={p.image}
+                    alt={`${p.brand} ${p.name}`}
+                    loading="lazy"
+                    className="h-full w-full object-contain p-3 mix-blend-multiply"
+                  />
+                </div>
                 <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">{p.category}</p>
                 <p className="mt-0.5 font-display text-[15px] font-semibold leading-tight">{p.name}</p>
                 <div className="mt-2 flex items-center justify-between">
