@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import { Platform, ProductType, store, type Transaction } from "capacitor-plugin-cdv-purchase";
+import type { Transaction } from "capacitor-plugin-cdv-purchase";
 import {
   PREMIUM_PRODUCT_IDS,
   billingForProductId,
@@ -20,6 +20,15 @@ type PurchaseListener = {
 let purchaseListener: PurchaseListener | null = null;
 let initialized = false;
 
+// capacitor-plugin-cdv-purchase touches `window` at module-load time, so it
+// must never be statically imported — that would pull it into the
+// server-rendered bundle (no `window` there) and crash SSR. Every entry
+// point below is already gated behind isIapAvailable()/a client-only effect,
+// so the dynamic import here only ever resolves in the browser.
+async function loadStore() {
+  return import("capacitor-plugin-cdv-purchase");
+}
+
 /** Lets the pricing screen react to the outcome of a purchase started elsewhere in this module. */
 export function setIapPurchaseListener(listener: PurchaseListener | null) {
   purchaseListener = listener;
@@ -33,6 +42,8 @@ export function isIapAvailable(): boolean {
 export async function initIap(): Promise<void> {
   if (initialized || !isIapAvailable()) return;
   initialized = true;
+
+  const { store, Platform, ProductType } = await loadStore();
 
   store.register(
     Object.values(PREMIUM_PRODUCT_IDS).map((id) => ({
@@ -73,6 +84,7 @@ export async function purchasePremium(billing: PremiumBilling): Promise<void> {
   if (!isIapAvailable()) {
     throw new Error("In-app purchases are only available in the BeautyAI iOS app.");
   }
+  const { store, Platform } = await loadStore();
   const productId = PREMIUM_PRODUCT_IDS[billing];
   const product = store.get(productId, Platform.APPLE_APPSTORE);
   const offer = product?.getOffer();
@@ -88,6 +100,7 @@ export async function purchasePremium(billing: PremiumBilling): Promise<void> {
 /** Restores previously purchased subscriptions (e.g. after a reinstall or on a new device). */
 export async function restorePurchases(): Promise<void> {
   if (!isIapAvailable()) return;
+  const { store } = await loadStore();
   const error = await store.restorePurchases();
   if (error) throw new Error(error.message || "Couldn't restore purchases.");
 }
