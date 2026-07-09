@@ -77,9 +77,10 @@ function Toggle({ label, defaultOn = false, last }: { label: string; defaultOn?:
   return (
     <label className={`flex items-center justify-between px-5 py-3.5 ${last ? "" : "border-b border-border/60"}`}>
       <span className="text-sm">{label}</span>
-      <input type="checkbox" defaultChecked={defaultOn} className="peer sr-only" />
-      <span className="relative h-6 w-10 rounded-full bg-muted transition peer-checked:bg-gradient-rose">
-        <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
+      <span className="relative inline-flex">
+        <input type="checkbox" defaultChecked={defaultOn} className="peer sr-only" />
+        <span className="block h-6 w-10 rounded-full bg-muted transition peer-checked:bg-gradient-rose" />
+        <span className="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition peer-checked:translate-x-4" />
       </span>
     </label>
   );
