@@ -1,9 +1,17 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import onboardingArt from "@/assets/onboarding-illustration.png";
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
+  head: () => ({
+    meta: [
+      { title: "Get started — BeautyAI" },
+      { name: "description", content: "Answer a few questions so BeautyAI can tailor your skincare routine and product recommendations." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 type Step = {
