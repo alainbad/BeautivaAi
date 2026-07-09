@@ -120,6 +120,9 @@ function buildFilter(a: Adjust) {
 }
 
 function EditPage() {
+  const { user } = useAuth();
+  const { data: sub } = useSubscription(user);
+  const pro = isPro(sub);
   const [image, setImage] = useState<string | null>(null);
   const [presetId, setPresetId] = useState<string>("original");
   const [adjust, setAdjust] = useState<Adjust>(DEFAULT_ADJUST);
