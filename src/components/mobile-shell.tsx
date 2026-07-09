@@ -31,7 +31,7 @@ export function MobileShell({ children }: { children: ReactNode }) {
                     to={t.to}
                     aria-label={t.label}
                     aria-current={active ? "page" : undefined}
-                    className={`flex min-w-16 flex-col items-center gap-1 rounded-2xl px-3 py-1.5 transition ${
+                    className={`flex min-w-12 flex-col items-center gap-1 rounded-2xl px-2 py-1.5 transition ${
                       active ? "text-primary" : "text-warm-gray"
                     }`}
                   >
