@@ -133,12 +133,14 @@ function Welcome() {
             </ul>
           </div>
           <div className="relative overflow-hidden rounded-3xl bg-gradient-blush p-5 shadow-lg">
-            <span className="absolute right-4 top-4 rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-rose-gold">
-              Popular
-            </span>
-            <div className="flex items-baseline justify-between">
+            <div className="mb-2 flex justify-end">
+              <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-rose-gold">
+                Popular
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between gap-3">
               <h3 className="font-display text-lg font-semibold">Premium</h3>
-              <span className="font-display text-xl">$4.99<span className="text-sm font-normal">/mo</span></span>
+              <span className="font-display text-xl whitespace-nowrap">$4.99<span className="text-sm font-normal">/mo</span></span>
             </div>
             <ul className="mt-3 space-y-1.5 text-sm text-foreground/80">
               <li>· Unlimited analyses</li>
