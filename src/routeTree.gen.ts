@@ -20,6 +20,7 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as ForgotRouteImport } from './routes/forgot'
+import { Route as EditRouteImport } from './routes/edit'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -80,6 +81,11 @@ const ForgotRoute = ForgotRouteImport.update({
   path: '/forgot',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EditRoute = EditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/analyze': typeof AnalyzeRoute
   '/chat': typeof ChatRoute
+  '/edit': typeof EditRoute
   '/forgot': typeof ForgotRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/analyze': typeof AnalyzeRoute
   '/chat': typeof ChatRoute
+  '/edit': typeof EditRoute
   '/forgot': typeof ForgotRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/analyze': typeof AnalyzeRoute
   '/chat': typeof ChatRoute
+  '/edit': typeof EditRoute
   '/forgot': typeof ForgotRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analyze'
     | '/chat'
+    | '/edit'
     | '/forgot'
     | '/home'
     | '/login'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analyze'
     | '/chat'
+    | '/edit'
     | '/forgot'
     | '/home'
     | '/login'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analyze'
     | '/chat'
+    | '/edit'
     | '/forgot'
     | '/home'
     | '/login'
@@ -212,6 +224,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AnalyzeRoute: typeof AnalyzeRoute
   ChatRoute: typeof ChatRoute
+  EditRoute: typeof EditRoute
   ForgotRoute: typeof ForgotRoute
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/edit': {
+      id: '/edit'
+      path: '/edit'
+      fullPath: '/edit'
+      preLoaderRoute: typeof EditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chat': {
       id: '/chat'
       path: '/chat'
@@ -340,6 +360,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AnalyzeRoute: AnalyzeRoute,
   ChatRoute: ChatRoute,
+  EditRoute: EditRoute,
   ForgotRoute: ForgotRoute,
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { MobileShell, ScreenHeader } from "@/components/mobile-shell";
 import { GlassCard, ScoreRing, Pill } from "@/components/ui-primitives";
 import { skinScore, lastAnalysisDate, morningRoutine, eveningRoutine, products, reminders, progressTimeline } from "@/lib/mock-data";
-import { Bell, ChevronRight, Sparkles, Sun, Moon, TrendingUp } from "lucide-react";
+import { Bell, ChevronRight, Sparkles, Sun, Moon, TrendingUp, Wand2 } from "lucide-react";
 
 export const Route = createFileRoute("/home")({
   component: Home,
@@ -46,6 +46,30 @@ function Home() {
           </div>
         </GlassCard>
       </section>
+
+      <section className="mt-4 px-6">
+        <Link
+          to="/edit"
+          className="group relative flex items-center gap-4 overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-blush via-card to-lavender/60 p-4 shadow-sm"
+        >
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-rose text-primary-foreground shadow-md">
+            <Wand2 className="h-5 w-5" />
+          </span>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <p className="font-display text-[15px] font-semibold">Photo studio</p>
+              <span className="rounded-full bg-white/70 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-rose-gold">
+                New
+              </span>
+            </div>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Retouch, glow, and glam your photos with beauty filters.
+            </p>
+          </div>
+          <ChevronRight className="h-4 w-4 text-rose-gold transition group-hover:translate-x-0.5" />
+        </Link>
+      </section>
+
 
       <section className="px-6 mt-6">
         <div className="flex items-center justify-between">
