@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import type { Database } from "@/lib/supabase/types";
 import { requireUser } from "@/server/lib/auth";
 import { askClaudeForJson } from "@/server/lib/claude-json";
 import { AppError, toApiResponse } from "@/server/lib/response";
@@ -8,6 +10,37 @@ import {
   SKIN_ANALYSIS_SYSTEM_PROMPT,
 } from "@/server/lib/skincare-schemas";
 import { uploadDataUrlImage } from "@/server/lib/storage";
+
+const FREE_PLAN_ANALYSES_PER_MONTH = 1;
+
+/** Enforces the pricing page's "1 skin analysis / month" free-tier limit. */
+async function enforceFreeAnalysisLimit(supabase: SupabaseClient<Database>, userId: string) {
+  const { data: subscription } = await supabase
+    .from("subscriptions")
+    .select("plan, status")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const isPremium = subscription?.plan === "premium" && subscription.status === "active";
+  if (isPremium) return;
+
+  const startOfMonth = new Date();
+  startOfMonth.setUTCDate(1);
+  startOfMonth.setUTCHours(0, 0, 0, 0);
+
+  const { count, error } = await supabase
+    .from("skin_analyses")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", startOfMonth.toISOString());
+  if (error) throw new AppError(error.message, 500);
+
+  if ((count ?? 0) >= FREE_PLAN_ANALYSES_PER_MONTH) {
+    throw new AppError(
+      "You've used your free skin analysis for this month. Upgrade to Premium for unlimited analyses.",
+      402,
+    );
+  }
+}
 
 /**
  * uploadSkinImage + analyzeSkinImage from the build spec, combined into one
@@ -19,6 +52,7 @@ export const analyzeSkinPhoto = createServerFn({ method: "POST" })
   .handler(async ({ data }) =>
     toApiResponse(async () => {
       const { supabase, user } = await requireUser();
+      await enforceFreeAnalysisLimit(supabase, user.id);
 
       const upload = await uploadDataUrlImage(supabase, {
         bucket: "skin-analysis-images",

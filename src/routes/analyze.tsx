@@ -71,6 +71,11 @@ function Analyze() {
         {error && (
           <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs text-destructive">
             {error}
+            {error.includes("Upgrade to Premium") && (
+              <Link to="/pricing" className="ml-1 font-semibold underline">
+                See plans
+              </Link>
+            )}
           </div>
         )}
 
