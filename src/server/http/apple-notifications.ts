@@ -1,5 +1,4 @@
 import { billingForProductId } from "@/lib/apple-iap-products";
-import { getAppleSignedDataVerifier } from "@/server/lib/apple-iap";
 import { getSupabaseAdminClient } from "@/server/lib/supabase";
 
 /**
@@ -27,7 +26,11 @@ export async function handleAppleNotification(request: Request): Promise<Respons
   }
 
   try {
-    const verifier = getAppleSignedDataVerifier();
+    // Dynamic import so this module (and @apple/app-store-server-library,
+    // which performs disallowed global-scope crypto I/O at load time) never
+    // gets pulled into the shared SSR chunk — see apple-iap.ts for details.
+    const { getAppleSignedDataVerifier } = await import("@/server/lib/apple-iap");
+    const verifier = await getAppleSignedDataVerifier();
     const notification = await verifier.verifyAndDecodeNotification(body.signedPayload);
 
     const signedTransactionInfo = notification.data?.signedTransactionInfo;

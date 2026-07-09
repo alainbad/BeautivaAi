@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { billingForProductId } from "@/lib/apple-iap-products";
 import { requireUser } from "@/server/lib/auth";
-import { getAppleSignedDataVerifier } from "@/server/lib/apple-iap";
 import { serverEnv } from "@/server/lib/env";
 import { AppError, toApiResponse } from "@/server/lib/response";
 import { getStripeClient } from "@/server/lib/stripe";
@@ -98,7 +97,11 @@ export const verifyApplePurchase = createServerFn({ method: "POST" })
   .handler(async ({ data }) =>
     toApiResponse(async () => {
       const { supabase, user } = await requireUser();
-      const verifier = getAppleSignedDataVerifier();
+      // Dynamic import so this module (and @apple/app-store-server-library,
+      // which performs disallowed global-scope crypto I/O at load time)
+      // never gets pulled into the shared SSR chunk — see apple-iap.ts.
+      const { getAppleSignedDataVerifier } = await import("@/server/lib/apple-iap");
+      const verifier = await getAppleSignedDataVerifier();
 
       const transaction = await verifier.verifyAndDecodeTransaction(data.signedTransaction);
 

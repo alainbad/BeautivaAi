@@ -1,15 +1,20 @@
-import {
-  AppStoreServerAPIClient,
-  Environment,
-  SignedDataVerifier,
+import type {
+  AppStoreServerAPIClient as AppStoreServerAPIClientType,
+  SignedDataVerifier as SignedDataVerifierType,
 } from "@apple/app-store-server-library";
 import { serverEnv } from "./env";
 import { AppError } from "./response";
 
-function appleEnvironment(): Environment {
-  return serverEnv.appleIapEnvironment === "Production"
-    ? Environment.PRODUCTION
-    : Environment.SANDBOX;
+/**
+ * @apple/app-store-server-library performs disallowed global-scope I/O the
+ * moment it's imported — Cloudflare Workers only allows that inside a
+ * request handler, not at module load. Since src/server.ts pulls this file
+ * in unconditionally (for the Apple notifications webhook), a static import
+ * here crashed every route, not just IAP ones. Must stay a dynamic import,
+ * resolved lazily inside the handlers below.
+ */
+async function loadAppleLib() {
+  return import("@apple/app-store-server-library");
 }
 
 /**
@@ -33,15 +38,16 @@ function loadAppleRootCertificates(): Buffer[] {
     .map((s) => Buffer.from(s, "base64"));
 }
 
-let verifier: SignedDataVerifier | undefined;
+let verifier: SignedDataVerifierType | undefined;
 
 /** Verifies + decodes JWS payloads (transactions, renewal info, notifications) signed by Apple. */
-export function getAppleSignedDataVerifier(): SignedDataVerifier {
+export async function getAppleSignedDataVerifier(): Promise<SignedDataVerifierType> {
   if (!verifier) {
+    const { SignedDataVerifier, Environment } = await loadAppleLib();
     verifier = new SignedDataVerifier(
       loadAppleRootCertificates(),
       true,
-      appleEnvironment(),
+      serverEnv.appleIapEnvironment === "Production" ? Environment.PRODUCTION : Environment.SANDBOX,
       serverEnv.appleIapBundleId,
       serverEnv.appleIapAppAppleId,
     );
@@ -49,17 +55,18 @@ export function getAppleSignedDataVerifier(): SignedDataVerifier {
   return verifier;
 }
 
-let apiClient: AppStoreServerAPIClient | undefined;
+let apiClient: AppStoreServerAPIClientType | undefined;
 
 /** Calls Apple's App Store Server API (subscription status lookups, refund history, etc). */
-export function getAppStoreServerApiClient(): AppStoreServerAPIClient {
+export async function getAppStoreServerApiClient(): Promise<AppStoreServerAPIClientType> {
   if (!apiClient) {
+    const { AppStoreServerAPIClient, Environment } = await loadAppleLib();
     apiClient = new AppStoreServerAPIClient(
       serverEnv.appleIapPrivateKey,
       serverEnv.appleIapKeyId,
       serverEnv.appleIapIssuerId,
       serverEnv.appleIapBundleId,
-      appleEnvironment(),
+      serverEnv.appleIapEnvironment === "Production" ? Environment.PRODUCTION : Environment.SANDBOX,
     );
   }
   return apiClient;
