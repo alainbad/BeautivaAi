@@ -99,7 +99,7 @@ function Pricing() {
                   : "text-foreground/70"
               }`}
             >
-              {b === "monthly" ? "Monthly" : "Yearly · save 33%"}
+              {b === "monthly" ? "Monthly" : "Yearly · save 16%"}
             </button>
           ))}
         </div>
@@ -130,14 +130,14 @@ function Pricing() {
             <h3 className="font-display text-xl font-semibold">Premium</h3>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="font-display text-3xl font-semibold">
-                {billing === "monthly" ? "$4.99" : "$39.99"}
+                {billing === "monthly" ? "$2.99" : "$29.99"}
               </span>
               <span className="text-sm text-foreground/70">
                 /{billing === "monthly" ? "month" : "year"}
               </span>
             </div>
             <p className="mt-1 text-xs text-foreground/70">
-              {billing === "yearly" ? "That's just $3.33/month, billed yearly." : "Cancel anytime."}
+              {billing === "yearly" ? "That's just $2.50/month, billed yearly." : "Cancel anytime."}
             </p>
             <ul className="mt-4 space-y-2 text-sm">
               {perks.premium.map((p) => (
